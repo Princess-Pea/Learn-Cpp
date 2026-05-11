@@ -51,6 +51,11 @@ public:
     {
         return score;
     }
+
+    void resetScore()
+    {
+        score = 0;
+    }
 };
 
 // the third class to create is the Game class, which will manage the players and the dice, process the game and determine the winner
@@ -92,13 +97,13 @@ public:
     friend void restart(); // declare the restart function as a friend of the Game class
 };
 
-int main()
-{
-    srand(static_cast<unsigned int>(time(0))); // seed the random number generator
-    Game0 game("Alice", "Bob");
-    game.start();
-    return 0;
-}
+// int main()
+// {
+//     srand(static_cast<unsigned int>(time(0))); // seed the random number generator
+//     Game0 game("Alice", "Bob");
+//     game.start();
+//     return 0;
+// }
 
 // 进一步优化这个游戏，增加一些功能。
 // 1.游戏结束后，询问玩家是否想要再玩一次，如果是，则重新开始游戏；如果不是，则退出程序。
@@ -143,21 +148,57 @@ public:
             cin >> name;
             players[i] = Player(name);
         }
+        do
+        {
+            for (int i = 0; i < numPlayers; ++i)
+                players[i].resetScore();
 
-        for (int i = 0; i < NumRounds; ++i)
-            forward(players, numPlayers);
+            for (int i = 0; i < NumRounds; ++i)
+                forward(players, numPlayers);
 
-        determineWinner(players, numPlayers);
+            determineWinner(players, numPlayers);
 
-        restart();
+        } while (restart());
     }
+
     void determineWinner(Player *players, int numPlayers)
     {
+        int maxScore = 0, winnerIndex = 0;
+        for (int i = 0; i < numPlayers; ++i)
+        {
+            cout << players[i].getName() << " has a score of " << players[i].getScore() << endl;
+            if (players[i].getScore() > maxScore)
+            {
+                maxScore = players[i].getScore();
+                winnerIndex = i;
+            }
+        }
+        cout << "The winner is " << players[winnerIndex].getName() << " with a score of " << maxScore << "!" << endl;
     }
+
     void forward(Player *players, int numPlayers)
     {
+        for (int i = 0; i < numPlayers; ++i)
+            players[i].play(dice);
     }
-    void restart()
+
+    bool restart()
     {
+        char choice;
+        cout << "Do you want to play again? (y/n): ";
+        cin >> choice;
+        return (choice == 'y' || choice == 'Y');
     }
 };
+
+int main()
+{
+    srand(static_cast<unsigned int>(time(0))); // seed the random number generator
+    int numPlayers, numRounds;
+    cout << "Enter the number of players: ";
+    cin >> numPlayers;
+    cout << "Enter the number of rounds: ";
+    cin >> numRounds;
+    Game game(numRounds, numPlayers);
+    return 0;
+}
