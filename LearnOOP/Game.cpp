@@ -54,7 +54,7 @@ public:
 };
 
 // the third class to create is the Game class, which will manage the players and the dice, process the game and determine the winner
-class Game
+class Game0
 {
 private:
     Dice dice;
@@ -63,7 +63,7 @@ private:
 public:
     // so what do we need to initialize a game? For the basic version, we just need two players and a dice.
     // constructor with default parameter
-    Game(string name1, string name2) : player1(name1), player2(name2) {}
+    Game0(string name1, string name2) : player1(name1), player2(name2) {}
     void determineWinner()
     {
         if (player1.getScore() > player2.getScore())
@@ -89,12 +89,75 @@ public:
         }
         determineWinner();
     }
+    friend void restart(); // declare the restart function as a friend of the Game class
 };
 
 int main()
 {
     srand(static_cast<unsigned int>(time(0))); // seed the random number generator
-    Game game("Alice", "Bob");
+    Game0 game("Alice", "Bob");
     game.start();
     return 0;
 }
+
+// 进一步优化这个游戏，增加一些功能。
+// 1.游戏结束后，询问玩家是否想要再玩一次，如果是，则重新开始游戏；如果不是，则退出程序。
+
+void restart()
+{
+    char choice;
+    cout << "Do you want to play again? (y/n): ";
+    cin >> choice;
+    if (choice == 'y' || choice == 'Y')
+    {
+        Game0 game("Alice", "Bob");
+        game.start();
+    }
+    else
+    {
+        cout << "Thanks for playing! Goodbye!" << endl;
+        exit(0);
+    }
+}
+
+// 2.玩家可以给角色命名，并且可以决定玩家数量。
+
+// 3.玩家可以选择他们想要玩的轮数，而不是固定的5轮。
+
+class Game
+{
+private:
+    Dice dice;
+    Player *players; // 使用数组来存储，这样就可以支持任意数量的玩家
+    int numPlayers;
+    int NumRounds;
+
+public:
+    Game(int N, int n) : NumRounds(N), numPlayers(n)
+    {
+        players = new Player[numPlayers];
+        for (int i = 0; i < numPlayers; ++i)
+        {
+            string name;
+            cout << "Enter name for player " << i + 1 << ": ";
+            cin >> name;
+            players[i] = Player(name);
+        }
+
+        for (int i = 0; i < NumRounds; ++i)
+            forward(players, numPlayers);
+
+        determineWinner(players, numPlayers);
+
+        restart();
+    }
+    void determineWinner(Player *players, int numPlayers)
+    {
+    }
+    void forward(Player *players, int numPlayers)
+    {
+    }
+    void restart()
+    {
+    }
+};
