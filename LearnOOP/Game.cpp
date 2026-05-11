@@ -173,7 +173,15 @@ public:
                 winnerIndex = i;
             }
         }
-        cout << "The winner is " << players[winnerIndex].getName() << " with a score of " << maxScore << "!" << endl;
+        cout << "The winner with a score of " << maxScore << " : " << players[winnerIndex].getName() << " ";
+        for (int i = winnerIndex + 1; i < numPlayers; ++i)
+        {
+            if (players[i].getScore() == maxScore)
+            {
+                cout << "and " << players[i].getName() << " "; // 处理平局的情况
+            }
+        }
+        cout << endl;
     }
 
     void forward(Player *players, int numPlayers)
