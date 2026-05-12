@@ -1,0 +1,115 @@
+#include <iostream>
+#include <cstdlib> // for rand() and srand()
+#include <ctime>   // for time()
+
+using namespace std;
+
+// let's make a turn-based combat game where we have a player and an enemy interact with each other by attacking and defending.
+
+class Character
+{
+private:
+    string name;
+    float health;
+    float attackPower;
+
+public:
+    Character(string n = " ", float h = 60.0, float a = 10.0) : name(n), health(h), attackPower(a) {}
+    string getName() const { return name; }
+    float getHealth() const { return health; }
+    float getAttackPower() const { return attackPower; }
+    void takeDamage(float damage)
+    {
+        health -= damage;
+        if (health < 0)
+            health = 0;
+    }
+};
+
+class Action
+{
+public:
+    void attack(Character &attacker, Character &subjective)
+    {
+        float damage = attacker.getAttackPower();
+        subjective.takeDamage(damage);
+        cout << attacker.getName() << " hits " << subjective.getName() << " with a damage of " << attacker.getAttackPower();
+        if (subjective.getHealth() <= 0)
+            cout << ", making " << subjective.getName() << " defeated!";
+        cout << endl;
+    }
+    void heal(Character &subjective)
+    {
+        cout << subjective.getName() << " heals for 10 health points!" << endl;
+        subjective.takeDamage(-10); // Heal by taking negative damage
+    }
+    void random(Character &enemy, Character &player)
+    {
+        int randNum = rand() % 10 + 1; // Generate a random number between 1 and 10
+        if (randNum <= 2)              // 30% chance to heal
+        {
+            cout << "A random event occurs! " << enemy.getName() << " finds a health potion and heals for 20 health points!" << endl;
+            enemy.takeDamage(-20); // Heal by taking negative damage
+        }
+        else
+        {
+            Action::attack(enemy, player); // Enemy attacks the player
+        }
+    }
+};
+
+class Game
+{
+private:
+    Character player;
+    Character enemy;
+    Action action;
+    int turn = 0;
+
+public:
+    Game(Character p, Character e) : player(p), enemy(e) {}
+    void start()
+    {
+        srand(static_cast<unsigned int>(time(0)));
+        cout << "Welcome to the Combat Game!" << endl
+             << "Please name your character!" << endl;
+        string name;
+        cin >> name;
+        this->player = Character(name, 60, 10);
+        this->enemy = Character("Enemy", 60, 10);
+        do
+        {
+            this->forward();
+        } while (this->check(this->player, this->enemy));
+        cout << "Game Over!" << endl;
+    }
+    bool check(Character &p, Character &e)
+    {
+        return (p.getHealth() > 0 && e.getHealth() > 0);
+    }
+    void forward()
+    {
+        char act;
+        turn++;
+        cout << "turn " << turn << ": " << "attack or heal? [a/h]:" << endl;
+        cin >> act;
+        if (act == 'a' || act == 'A')
+        {
+            action.attack(this->player, this->enemy);
+        }
+        if (act == 'h' || act == 'H')
+        {
+            action.heal(this->player);
+        }
+        if (!this->check(this->player, this->enemy))
+            return;
+        action.random(this->enemy, this->player);
+    }
+};
+
+int main()
+{
+    Game game(Character("Player", 60, 10), Character("Enemy", 60, 10));
+    game.start();
+    return 0;
+}
