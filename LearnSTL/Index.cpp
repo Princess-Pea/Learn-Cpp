@@ -96,15 +96,18 @@ namespace stl2
         clock_t timeStart = clock();
         for (long i = 0; i < value; ++i)
         {
-            try
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
             {
                 snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
                 c.push_back(string(buf));
+                // 将字符串添加到vector中
             }
             catch (exception &p)
             {
                 cout << "i=" << i << " " << p.what() << endl;
-                abort();
+                // 如果发生异常，输出当前的索引i和异常信息，然后终止程序
+                abort(); // 终止程序的执行，通常用于在发生严重错误时立即退出程序
             }
         }
         clock_t timeEnd = clock();
@@ -113,14 +116,41 @@ namespace stl2
         cout << "front=" << c.front() << endl;
         cout << "back=" << c.back() << endl;
         cout << "data=" << c.data() << endl;
+        // data()函数返回一个指向vector内部数组的指针，可以直接访问vector中的元素，但需要注意不要越界访问。
         cout << "capacity=" << c.capacity() << endl;
+
+        string target = get_a_target_string();
+        {
+            timeStart = clock();
+            auto Item = ::find(c.begin(), c.end(), target);
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+        }
+        {
+            timeStart = clock();
+            sort(c.begin(), c.end());
+            string *Item = (string *)bsearch(&target, c.data(), c.size(), sizeof(string), compareStrings);
+            timeEnd = clock();
+            if (Item != nullptr)
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+        }
+        // find 和 bsearch 都是用来查找元素的函数。
+        // find是C++标准库中的算法，适用于任何容器，而bsearch是C标准库中的函数，适用于数组。
+        // find使用线性搜索算法，时间复杂度为O(n)，而bsearch使用二分搜索算法，时间复杂度为O(log n)，但需要数组已经排序。
+        // 在这个测试中，首先使用find函数在vector中查找目标字符串，记录查找所需的时间，然后使用bsearch函数在排序后的vector中查找目标字符串，记录查找所需的时间，并输出结果。
+        // 理论上，bsearch应该比find更快，因为它使用了二分搜索算法。但我们的程序还统计了排序的时间，所以bsearch总的时间会更长，特别是像这样当vector中的元素较多时。
     }
 }
 
 // main函数调用stl2::test_vector()函数，并传入一个long类型的参数，表示要测试的元素个数。
-// int main()
-// {
-//     long value = 1000000;     // 要测试的元素个数，可以根据需要修改
-//     stl2::test_vector(value); // 调用stl2命名空间中的test_vector函数，并传入value参数
-//     return 0;
-// }
+int main()
+{
+    long value = 1000000;     // 要测试的元素个数，可以根据需要修改
+    stl2::test_vector(value); // 调用stl2命名空间中的test_vector函数，并传入value参数
+    return 0;
+}
