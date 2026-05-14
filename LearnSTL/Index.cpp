@@ -147,10 +147,62 @@ namespace stl2
     }
 }
 
+#include <list>
+namespace stl3
+{
+    void test_list(long &value)
+    {
+        cout << "\nTesting list...\n";
+        list<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.push_back(string(buf));
+                // 将字符串添加到list中
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        clock_t timeEnd = clock();
+        cout << "Time taken: " << (timeEnd - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "max_size=" << c.max_size() << endl;
+        cout << "front=" << c.front() << endl;
+        cout << "back=" << c.back() << endl;
+
+        string target = get_a_target_string();
+        {
+            timeStart = clock();
+            auto Item = ::find(c.begin(), c.end(), target);
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+        }
+        {
+            timeStart = clock();
+            c.sort();
+            timeEnd = clock();
+            cout << "Time taken to sort: " << (timeEnd - timeStart) << endl;
+        }
+    }
+}
+
 // main函数调用stl2::test_vector()函数，并传入一个long类型的参数，表示要测试的元素个数。
 int main()
 {
     long value = 1000000;     // 要测试的元素个数，可以根据需要修改
     stl2::test_vector(value); // 调用stl2命名空间中的test_vector函数，并传入value参数
+    stl3::test_list(value);   // 调用stl3命名空间中的test_list函数，并传入value参数
     return 0;
 }
