@@ -248,11 +248,65 @@ namespace stl4
     }
 }
 
+#include <deque>
+namespace stl5
+{
+    void test_deque(long &value)
+    {
+        cout << "\nTesting deque...\n";
+        deque<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.push_back(string(buf));
+                // 将字符串添加到deque中
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        clock_t timeEnd = clock();
+        cout << "Time taken: " << (timeEnd - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "max_size=" << c.max_size() << endl;
+        cout << "front=" << c.front() << endl;
+        cout << "back=" << c.back() << endl;
+
+        string target = get_a_target_string();
+        {
+            timeStart = clock();
+            auto Item = ::find(c.begin(), c.end(), target);
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            timeStart = clock();
+            sort(c.begin(), c.end());
+            cout << "Time taken to sort: " << (clock() - timeStart) << endl;
+        }
+    }
+}
+
+#include <ext\slist>
+namespace stl10
+{
+}
+
 int main()
 {
     long value = 1000000;           // 要测试的元素个数，可以根据需要修改
     stl2::test_vector(value);       // 调用stl2命名空间中的test_vector函数，并传入value参数
     stl3::test_list(value);         // 调用stl3命名空间中的test_list函数，并传入value参数
     stl4::test_forward_list(value); // 调用stl4命名空间中的test_forward_list函数，并传入value参数
+    stl5::test_deque(value);        // 调用stl5命名空间中的test_deque函数，并传入value参数
     return 0;
 }
