@@ -296,6 +296,40 @@ namespace stl5
     }
 }
 
+#include <stack>
+namespace stl6
+{
+    void test_stack(long &value)
+    {
+        cout << "\nTesting stack...\n";
+        stack<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.push(string(buf));
+                // 将字符串添加到stack中
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        cout << "Time taken: " << (clock() - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "top=" << c.top() << endl;
+        c.pop();
+        cout << "After pop, size=" << c.size() << endl;
+        cout << "New top=" << c.top() << endl;
+    }
+}
+
 #include <ext\slist>
 namespace stl10
 {
@@ -308,5 +342,6 @@ int main()
     stl3::test_list(value);         // 调用stl3命名空间中的test_list函数，并传入value参数
     stl4::test_forward_list(value); // 调用stl4命名空间中的test_forward_list函数，并传入value参数
     stl5::test_deque(value);        // 调用stl5命名空间中的test_deque函数，并传入value参数
+    stl6::test_stack(value);        // 调用stl6命名空间中的test_stack函数，并传入value参数
     return 0;
 }
