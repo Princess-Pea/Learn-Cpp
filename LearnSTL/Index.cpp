@@ -123,6 +123,8 @@ namespace stl2
         {
             timeStart = clock();
             auto Item = ::find(c.begin(), c.end(), target);
+            // 使用全局命名空间中的find函数，在vector c的范围内查找目标字符串target，返回一个迭代器指向找到的元素，如果没有找到则返回c.end()
+            // find函数是C++标准库中的算法，适用于任何容器，使用线性搜索算法，时间复杂度为O(n)。具体来说，find函数会从c.begin()开始逐个比较元素与target是否相等，直到找到匹配的元素或者遍历完整个vector。
             timeEnd = clock();
             if (Item != c.end())
                 cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
@@ -192,17 +194,65 @@ namespace stl3
         {
             timeStart = clock();
             c.sort();
+            // list容器有自己的sort成员函数，可以直接对list进行排序，而不需要像vector那样使用全局的sort算法。
+            // 为什么要专门为list提供一个sort成员函数呢？因为list是一个双向链表，使用归并排序算法来排序是非常高效的，而全局的sort算法通常使用快速排序或堆排序，这些算法在链表结构上效率较低。
             timeEnd = clock();
             cout << "Time taken to sort: " << (timeEnd - timeStart) << endl;
         }
     }
 }
 
-// main函数调用stl2::test_vector()函数，并传入一个long类型的参数，表示要测试的元素个数。
+#include <forward_list>
+namespace stl4
+{
+    void test_forward_list(long &value)
+    {
+        cout << "\nTesting forward_list...\n";
+        forward_list<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.push_front(string(buf));
+                // 将字符串添加到forward_list的前面
+                // push_front()函数是forward_list容器特有的成员函数，用于在forward_list的前面插入元素。由于forward_list是一个单向链表，不能像list那样在后面插入元素，所以只能使用push_front()来添加元素。
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        clock_t timeEnd = clock();
+        cout << "Time taken: " << (timeEnd - timeStart) << endl;
+        cout << "max_size=" << c.max_size() << endl;
+        cout << "size=" << distance(c.begin(), c.end()) << endl;
+        // forward_list没有size()成员函数，但可以使用distance函数来计算元素个数
+        cout << "front=" << c.front() << endl;
+
+        string target = get_a_target_string();
+        {
+            timeStart = clock();
+            auto Item = ::find(c.begin(), c.end(), target);
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+        }
+    }
+}
+
 int main()
 {
-    long value = 1000000;     // 要测试的元素个数，可以根据需要修改
-    stl2::test_vector(value); // 调用stl2命名空间中的test_vector函数，并传入value参数
-    stl3::test_list(value);   // 调用stl3命名空间中的test_list函数，并传入value参数
+    long value = 1000000;           // 要测试的元素个数，可以根据需要修改
+    stl2::test_vector(value);       // 调用stl2命名空间中的test_vector函数，并传入value参数
+    stl3::test_list(value);         // 调用stl3命名空间中的test_list函数，并传入value参数
+    stl4::test_forward_list(value); // 调用stl4命名空间中的test_forward_list函数，并传入value参数
     return 0;
 }
