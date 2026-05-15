@@ -369,6 +369,7 @@ namespace stl7
 namespace stl8
 {
     void test_multiset(long &value)
+    // multiset是一个关联容器，允许存储重复的元素，并且元素是按照升序排列的。具体来说，multiset使用一个平衡二叉树（通常是红黑树）来存储元素，这使得插入、删除和查找操作的时间复杂度为O(log n)。在这个测试中，我们将向multiset中插入随机生成的字符串，并测试查找操作的性能。
     {
         cout << "\nTesting multiset...\n";
         multiset<string> c;
@@ -398,7 +399,7 @@ namespace stl8
         string target = get_a_target_string();
         {
             timeStart = clock();
-            auto Item = c.find(target);
+            auto Item = ::find(c.begin(), c.end(), target); // 全局线性搜索
             timeEnd = clock();
             if (Item != c.end())
                 cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
@@ -407,11 +408,55 @@ namespace stl8
         }
         {
             timeStart = clock();
-            auto pItem = c.find(target);
+            auto pItem = c.find(target); // multiset的成员函数find，使用二分搜索算法，时间复杂度为O(log n)，因为multiset内部是有序的。
             if (pItem != c.end())
                 cout << "Found " << target << " in " << (clock() - timeStart) << " ticks.\n";
             else
                 cout << "Did not find " << target << " in " << (clock() - timeStart) << " ticks.\n";
+        }
+    }
+}
+
+#include <map>
+namespace stl9
+{
+    void test_multimap(long &value)
+    {
+        cout << "\nTesting multimap...\n";
+        multimap<string, int> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.insert(make_pair(string(buf), i));
+                // 将字符串和对应的整数索引插入到multimap中
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        clock_t timeEnd = clock();
+        cout << "Time taken: " << (timeEnd - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "max_size=" << c.max_size() << endl;
+
+        long target = get_a_target_long();
+        {
+            timeStart = clock();
+            auto Item = c.find(string(to_string(target)));
+            // multimap的成员函数find，使用二分搜索算法，时间复杂度为O(log n)，因为multimap内部是有序的。
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
         }
     }
 }
@@ -430,6 +475,7 @@ int main()
     // stl5::test_deque(value);        // 调用stl5命名空间中的test_deque函数，并传入value参数
     // stl6::test_stack(value);        // 调用stl6命名空间中的test_stack函数，并传入value参数
     // stl7::test_queue(value);        // 调用stl7命名空间中的test_queue函数，并传入value参数
-    stl8::test_multiset(value); // 调用stl8命名空间中的test_multiset函数，并传入value参数
+    // stl8::test_multiset(value); // 调用stl8命名空间中的test_multiset函数，并传入value参数
+    stl9::test_multimap(value); // 调用stl9命名空间中的test_multimap函数，并传入value参数
     return 0;
 }
