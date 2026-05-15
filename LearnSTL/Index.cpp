@@ -421,6 +421,7 @@ namespace stl8
 namespace stl9
 {
     void test_multimap(long &value)
+    // multimap是一个关联容器，允许存储重复的键值对，并且键是按照升序排列的。具体来说，multimap使用一个平衡二叉树（通常是红黑树）来存储键值对，这使得插入、删除和查找操作的时间复杂度为O(log n)。在这个测试中，我们将向multimap中插入随机生成的字符串作为键，以及对应的整数索引作为值，并测试查找操作的性能。
     {
         cout << "\nTesting multimap...\n";
         multimap<string, int> c;
@@ -433,7 +434,8 @@ namespace stl9
             {
                 snprintf(buf, 10, "%d", rand());
                 // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
-                c.insert(make_pair(string(buf), i));
+                c.insert(pair<string, int>(string(buf), i));
+                // multimap不可使用operator[]来插入元素，因为multimap允许存储重复的键，而operator[]会覆盖已有的键值对。
                 // 将字符串和对应的整数索引插入到multimap中
             }
             catch (exception &p)
@@ -454,15 +456,75 @@ namespace stl9
             // multimap的成员函数find，使用二分搜索算法，时间复杂度为O(log n)，因为multimap内部是有序的。
             timeEnd = clock();
             if (Item != c.end())
+            {
                 cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+                cout << "Value associated with " << target << " is " << Item->second << endl;
+            }
             else
                 cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
         }
     }
 }
 
-#include <ext\slist>
+#include <unordered_set>
 namespace stl10
+{
+    void test_unordered_multiset(long &value)
+    {
+        cout << "\nTesting unordered_multiset...\n";
+        unordered_multiset<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try
+            {
+                snprintf(buf, 10, "%d", rand());
+                c.insert(string(buf));
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        clock_t timeEnd = clock();
+        cout << "Time taken: " << (timeEnd - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "max_size=" << c.max_size() << endl;
+        cout << "bucket_count=" << c.bucket_count() << endl;
+        // unordered_multiset的桶数量，表示哈希表中桶的个数
+        cout << "max_bucket_count=" << c.max_bucket_count() << endl;
+        // unordered_multiset的最大桶数量，表示哈希表中桶的最大个数
+        cout << "load_factor=" << c.load_factor() << endl;
+        // unordered_multiset的负载因子，表示哈希表中元素数量与桶数量的比值
+        cout << "max_load_factor=" << c.max_load_factor() << endl;
+        // unordered_multiset的最大负载因子，表示当负载因子超过这个值时，哈希表会自动扩容
+
+        for (unsigned i = 0; i < 200; ++i)
+        {
+            cout << "Bucket #" << i << " has " << c.bucket_size(i) << " elements.\n";
+            // 输出每个桶中的元素数量，bucket_size(i)函数返回第i个桶中的元素数量
+            // 实际输出时，非零元素的桶数量可能远小于200，因为哈希表中的元素分布可能不均匀，某些桶可能没有元素，而某些桶可能有多个元素。
+        }
+
+        string target = get_a_target_string();
+        {
+            timeStart = clock();
+            auto Item = c.find(target);
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+        }
+    }
+
+}
+
+#include <ext\slist>
+namespace stl100
 {
 }
 
@@ -476,6 +538,7 @@ int main()
     // stl6::test_stack(value);        // 调用stl6命名空间中的test_stack函数，并传入value参数
     // stl7::test_queue(value);        // 调用stl7命名空间中的test_queue函数，并传入value参数
     // stl8::test_multiset(value); // 调用stl8命名空间中的test_multiset函数，并传入value参数
-    stl9::test_multimap(value); // 调用stl9命名空间中的test_multimap函数，并传入value参数
+    // stl9::test_multimap(value); // 调用stl9命名空间中的test_multimap函数，并传入value参数
+    stl10::test_unordered_multiset(value); // 调用stl10命名空间中的test_unordered_multiset函数，并传入value参数
     return 0;
 }
