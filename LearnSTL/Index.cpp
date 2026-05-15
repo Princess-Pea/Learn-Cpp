@@ -330,6 +330,92 @@ namespace stl6
     }
 }
 
+#include <queue>
+namespace stl7
+{
+    void test_queue(long &value)
+    {
+        cout << "\nTesting queue...\n";
+        queue<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.push(string(buf));
+                // 将字符串添加到queue中
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        cout << "Time taken: " << (clock() - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "front=" << c.front() << endl;
+        cout << "back=" << c.back() << endl;
+        c.pop();
+        cout << "After pop, size=" << c.size() << endl;
+        cout << "New front=" << c.front() << endl;
+    }
+}
+
+#include <set>
+namespace stl8
+{
+    void test_multiset(long &value)
+    {
+        cout << "\nTesting multiset...\n";
+        multiset<string> c;
+        char buf[10];
+
+        clock_t timeStart = clock();
+        for (long i = 0; i < value; ++i)
+        {
+            try // 使用try-catch块来捕获可能发生的异常，防止程序崩溃
+            {
+                snprintf(buf, 10, "%d", rand());
+                // 生成一个随机数，将其转换为字符串，存储在buf中，最多10个字符，包括终止符\0
+                c.insert(string(buf));
+                // 将字符串插入到multiset中
+            }
+            catch (exception &p)
+            {
+                cout << "i=" << i << " " << p.what() << endl;
+                abort();
+            }
+        }
+        clock_t timeEnd = clock();
+        cout << "Time taken: " << (timeEnd - timeStart) << endl;
+        cout << "size=" << c.size() << endl;
+        cout << "max_size=" << c.max_size() << endl;
+
+        string target = get_a_target_string();
+        {
+            timeStart = clock();
+            auto Item = c.find(target);
+            timeEnd = clock();
+            if (Item != c.end())
+                cout << "Found " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (timeEnd - timeStart) << " ticks.\n";
+        }
+        {
+            timeStart = clock();
+            auto pItem = c.find(target);
+            if (pItem != c.end())
+                cout << "Found " << target << " in " << (clock() - timeStart) << " ticks.\n";
+            else
+                cout << "Did not find " << target << " in " << (clock() - timeStart) << " ticks.\n";
+        }
+    }
+}
+
 #include <ext\slist>
 namespace stl10
 {
@@ -337,11 +423,13 @@ namespace stl10
 
 int main()
 {
-    long value = 1000000;           // 要测试的元素个数，可以根据需要修改
-    stl2::test_vector(value);       // 调用stl2命名空间中的test_vector函数，并传入value参数
-    stl3::test_list(value);         // 调用stl3命名空间中的test_list函数，并传入value参数
-    stl4::test_forward_list(value); // 调用stl4命名空间中的test_forward_list函数，并传入value参数
-    stl5::test_deque(value);        // 调用stl5命名空间中的test_deque函数，并传入value参数
-    stl6::test_stack(value);        // 调用stl6命名空间中的test_stack函数，并传入value参数
+    long value = 1000000; // 要测试的元素个数，可以根据需要修改
+    // stl2::test_vector(value);       // 调用stl2命名空间中的test_vector函数，并传入value参数
+    // stl3::test_list(value);         // 调用stl3命名空间中的test_list函数，并传入value参数
+    // stl4::test_forward_list(value); // 调用stl4命名空间中的test_forward_list函数，并传入value参数
+    // stl5::test_deque(value);        // 调用stl5命名空间中的test_deque函数，并传入value参数
+    // stl6::test_stack(value);        // 调用stl6命名空间中的test_stack函数，并传入value参数
+    // stl7::test_queue(value);        // 调用stl7命名空间中的test_queue函数，并传入value参数
+    stl8::test_multiset(value); // 调用stl8命名空间中的test_multiset函数，并传入value参数
     return 0;
 }
