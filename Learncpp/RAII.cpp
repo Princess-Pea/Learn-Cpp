@@ -40,6 +40,13 @@ int main()
     // catch (std::bad_alloc){
     // 处理内存分配失败的情况，例如输出错误信息或终止程序
     // }
+    delete pc;
+    // 编译器会转为：
+    // pc->~Complex<double>();
+    // 调用pc指向的对象的析构函数来销毁对象，释放对象占用的资源。
+    // operator delete(pc);
+    // 使用全局命名空间中的operator delete来释放之前分配的内存，传入pc作为参数。
+    // 析构函数的调用和内存的释放是分开的，这也是C++中RAII原则的一部分，确保资源在对象生命周期结束时被正确管理和释放。
 
     void *p3 = ::operator new(512);
     ::operator delete(p3);
