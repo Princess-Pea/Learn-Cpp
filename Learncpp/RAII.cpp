@@ -160,6 +160,34 @@ namespace RAII4
     }
 }
 
+#include <new> // 包含C++标准库头文件，提供placement new的声明
+namespace RAII5
+{
+    void test()
+    {
+        char *buf = new char[sizeof(A) * 3];
+        A *pA = new (buf) A(1); // 使用placement new，在buf指向的内存位置构造一个A对象，传入参数1来调用A的构造函数。
+        // 编译器转为：
+        // A *tmp;
+        // try
+        // {
+        //     void *mem = operator new(sizeof(A),buf); // allocate, 这是标准库提供的一个重载，本质上是:
+        // //    void *operator new(size_t size, void *place) { return place;}
+        // 即placement new并不负责内存的分配，而是直接使用我们提供的内存地址来构造对象。
+        //     tmp = static_cast<A *>(mem); // cast
+        //     tmp->A::A(2); // construct
+        // }
+        // catch(std::bad_alloc)
+        // {
+        //     //
+        // }
+        // 所以 placement new 等价于：
+        new (buf) A(2);
+        ::operator new(sizeof(A), buf);
+        delete[] buf;
+        }
+}
+
 int main()
 {
     RAII1::test();
