@@ -185,15 +185,104 @@ namespace RAII5
         new (buf) A(2);
         ::operator new(sizeof(A), buf);
         delete[] buf;
-        }
+    }
+}
+
+// 下面的代码演示了如何重载全局的operator new和operator delete函数，以使用自定义的内存分配和释放函数（myAlloc和myFree）。
+// 通过重载这些运算符，我们可以控制对象的内存分配和释放过程，确保资源在对象生命周期内被正确管理和释放。这也是RAII原则的一部分，确保资源在不再需要时被正确释放，避免内存泄漏和其他资源管理问题。
+// namespace RAII6
+// {
+
+// #define N 3
+//     void *myAlloc(size_t size)
+//     {
+//         return malloc(size);
+//     }
+//     void myFree(void *p)
+//     {
+//         return free(p);
+//     }
+//     void test()
+//     {
+//         Foo *p = new Foo; // 这将调用我们重载的operator new函数来分配内存。
+//         delete p;         // 这将调用我们重载的operator delete函数来释放内存。
+//         Foo *p = new Foo[N];
+//         delete[] p;
+//     }
+// }
+// // 以下重载不可以声明于一个命名空间内，因为它们是全局的operator new和operator delete函数，必须在全局命名空间中进行定义。
+// inline void *operator new(size_t size)
+// {
+//     return RAII6::myAlloc(size);
+// }
+// inline void operator delete(void *p)
+// {
+//     RAII6::myFree(p);
+// }
+// inline void *operator new[](size_t size)
+// {
+//     return RAII6::myAlloc(size);
+// }
+// inline void operator delete[](void *p)
+// {
+//     return RAII6::myFree(p);
+// }
+
+namespace RAII7
+{
+    class Foo
+    {
+    public:
+        int _id;
+        long _data;
+        string _str;
+
+        Foo() : _id(0) { cout << "default ctor.this = " << this << " _id = " << _id << endl; }
+        Foo(int id) : _id(id) { cout << "ctor.this = " << this << " _id = " << _id << endl; }
+        ~Foo() { cout << "dtor.this = " << this << " _id = " << _id << endl; }
+
+        // per-class allocator, 这两个函数必须声明为static成员函数，因为它们是类级别的内存管理函数，不依赖于任何特定的对象实例。通过将它们声明为static，我们可以直接通过类名来调用这些函数，而不需要创建类的对象实例。这也是C++中RAII原则的一部分，确保资源在对象生命周期内被正确管理和释放。
+        static void *operator new(size_t size);
+        static void *operator new[](size_t size);
+        static void operator delete(void *, size_t);
+        static void operator delete[](void *, size_t);
+    };
+
+    void *Foo::operator new(size_t size)
+    {
+        Foo *p = (Foo *)malloc(size);
+        return p;
+    }
+    void *Foo::operator new[](size_t size)
+    {
+        Foo *p = (Foo *)malloc(size);
+        return p;
+    }
+    void Foo::operator delete(void *p, size_t size)
+    {
+        free(p);
+    }
+    void Foo::operator delete[](void *p, size_t size)
+    {
+        free(p);
+    }
+
+    void test()
+    {
+        Foo *p = new Foo(7); // 这将调用Foo类的operator new函数来分配内存。
+        delete p;            // 这将调用Foo类的operator delete函数来释放内存。
+        Foo *pArray = new Foo[5];
+        delete[] pArray;
+    }
 }
 
 int main()
 {
-    RAII1::test();
-    RAII2::test_basic_string();
-    RAII2::test_class_A();
-    RAII3::test_A_array(3);
+    // RAII1::test();
+    // RAII2::test_basic_string();
+    // RAII2::test_class_A();
+    // RAII3::test_A_array(3);
+    RAII7::test();
 
     return 0;
 }
