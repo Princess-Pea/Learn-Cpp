@@ -244,7 +244,16 @@ namespace RAII7
         // per-class allocator, 这两个函数必须声明为static成员函数，因为它们是类级别的内存管理函数，不依赖于任何特定的对象实例。通过将它们声明为static，我们可以直接通过类名来调用这些函数，而不需要创建类的对象实例。这也是C++中RAII原则的一部分，确保资源在对象生命周期内被正确管理和释放。
         static void *operator new(size_t size);
         static void *operator new[](size_t size);
+        void *operator new(size_t size, void *place) { return place; }
+        // placement new 的重载函数，允许在指定的内存位置构造对象。这里跟标准库提供的placement new函数等价，直接返回传入的内存地址。
+        void *operator new[](size_t size, long extra) { return malloc(size + extra); }
+        // 真正意义的重载，允许在分配数组内存时指定一个额外的参数extra，用于增加分配的内存大小。这可以用于在数组前面添加一些额外的信息，例如数组的长度等。
+        //! void *operator new[](long extra) { return malloc(size + extra); }  // [error] size_t must be the first parameter
+
         static void operator delete(void *, size_t);
+        void operator delete(void *, void *) { /* do nothing */ }
+        void operator delete[](void *, long) { /* do nothing */ }
+        // operator delete 与 operator new 成对出现
         static void operator delete[](void *, size_t);
     };
 
