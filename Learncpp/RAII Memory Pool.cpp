@@ -169,7 +169,7 @@ namespace Ator2
 
 namespace Ator3
 {
-    class allocator
+    class allocator // static allocator class, which can be used by multiple classes to manage memory allocation and deallocation.
     {
     private:
         struct obj
@@ -215,12 +215,29 @@ namespace Ator3
         freeStore = (obj *)ptr;
     }
 
+#define DECLARE_POOL_ALLOC()                            \
+public:                                                 \
+    static void *operator new(size_t size)              \
+    {                                                   \
+        return myAlloc.allocate(size);                  \
+    }                                                   \
+    static void operator delete(void *ptr, size_t size) \
+    {                                                   \
+        myAlloc.deallocate(ptr, size);                  \
+    }                                                   \
+                                                        \
+protected:                                              \
+    inline static allocator myAlloc; // C++17 类内定义
+
+#define IMPLEMENT_POOL_ALLOC(class_name) \
+    allocator class_name::myAlloc;
+
     class Foo
     {
     public:
         long L;
         string str;
-        static allocator myAlloc;
+        inline static allocator myAlloc; // 可以用inline直接在类内声明并初始化静态成员变量myAlloc，无需在类外定义和初始化。
 
     public:
         Foo(long l) : L(l) {}
@@ -233,33 +250,46 @@ namespace Ator3
             myAlloc.deallocate(pdead, size);
         }
     };
-    allocator Foo::myAlloc;
+    // allocator Foo::myAlloc;
 
     class Goo
     {
     public:
         double D;
         string str;
-        static allocator myAlloc;
 
-    public:
         Goo(double d) : D(d) {}
-        static void *operator new(size_t size)
-        {
-            return myAlloc.allocate(size);
-        }
-        static void operator delete(void *pdead, size_t size)
-        {
-            myAlloc.deallocate(pdead, size);
-        }
-    };
-    allocator Goo::myAlloc;
 
+        DECLARE_POOL_ALLOC() // 宏
+    };
+
+    void test()
+    {
+        Foo *f[100];
+        Goo *g[100];
+
+        for (int i = 0; i < 30; ++i)
+        {
+            f[i] = new Foo(i);
+            cout << f[i] << " " << f[i]->L << endl;
+        }
+        for (int i = 0; i < 30; ++i)
+        {
+            g[i] = new Goo(i * 0.1);
+            cout << g[i] << " " << g[i]->D << endl;
+        }
+        for (int i = 0; i < 30; ++i)
+        {
+            delete f[i];
+            delete g[i];
+        }
+    }
 }
 
 int main()
 {
     // Ator1::test();
     // Ator2::test();
+    Ator3::test();
     return 0;
 }
