@@ -132,10 +132,134 @@ namespace Ator2
         }
         return p;
     }
+
+    void Airplane::operator delete(void *deadObject, size_t size)
+    {
+        // 如果传入的指针为nullptr，直接返回，不进行任何操作。（因为释放一个空指针是安全的）
+        if (deadObject == nullptr)
+            return;
+        // 如果请求的大小不等于Airplane对象的大小，调用全局的operator delete来释放内存。
+        if (size != sizeof(Airplane))
+        {
+            ::operator delete(deadObject);
+            return;
+        }
+
+        Airplane *carcass = static_cast<Airplane *>(deadObject);
+        carcass->next = headOfFreeList; // 将释放的对象添加到空闲链表的头部，以便下次分配时可以重用这个对象。
+        headOfFreeList = carcass;       // 更新headOfFreeList指向刚刚释放的对象。
+    }
+
+    void test()
+    {
+        cout << "sizeof(Airplane) = " << sizeof(Airplane) << endl; // 输出Airplane类的大小，单位为字节。
+        size_t const N = 100;
+        Airplane *p[N]; // 定义一个Airplane类型的指针数组p，大小为N，用于存储分配的Airplane对象的地址。
+        for (size_t i = 0; i < N; ++i)
+            p[i] = new Airplane; // 使用new运算符分配N个Airplane对象，并将它们的地址存储在指针数组p中。
+        p[1]->set(1000, 'A');    // 设置p[1]对象的miles为1000，type为'A'。
+        p[5]->set(2000, 'B');    // 设置p[5]对象的miles为2000，type为'B'。
+        p[9]->set(500000, 'C');  // 设置p[9]对象的miles为3000，type为'C'。
+        for (size_t i = 0; i < 10; ++i)
+            cout << p[i] << endl; // 输出分配的Airplane对象的地址，单位为字节。
+        for (size_t i = 0; i < N; ++i)
+            delete p[i]; // 使用delete运算符释放之前分配的Airplane对象，确保资源在对象生命周期内被正确管理和释放。
+    }
+}
+
+namespace Ator3
+{
+    class allocator
+    {
+    private:
+        struct obj
+        {
+            struct obj *next; // embodded pointer
+        };
+
+    public:
+        void *allocate(size_t);
+        void deallocate(void *, size_t);
+
+    private:
+        obj *freeStore = nullptr;
+        static const int chunk = 5;
+    };
+
+    void *allocator::allocate(size_t size)
+    {
+        if (size != sizeof(obj))
+            return ::operator new(size);
+
+        obj *p;
+        if (!freeStore)
+        {
+            // 没有空闲对象，分配一块新的内存来存储chunk个obj对象，并将它们链接成一个链表。
+            size_t chunkSize = chunk * size;
+            freeStore = p = (obj *)malloc(chunkSize);
+            for (int i = 0; i < chunk - 1; ++i)
+            {
+                p->next = (obj *)((char *)p + size);
+                p = (p->next);
+            }
+            p->next = nullptr;
+        }
+        p = freeStore;               // 从freeStore中取出一个对象，赋值给p。
+        freeStore = freeStore->next; // 更新freeStore指向下一个空闲对象。
+        return p;                    // 返回分配的对象的地址。
+    }
+
+    void allocator::deallocate(void *ptr, size_t size)
+    {
+        ((obj *)ptr)->next = freeStore;
+        freeStore = (obj *)ptr;
+    }
+
+    class Foo
+    {
+    public:
+        long L;
+        string str;
+        static allocator myAlloc;
+
+    public:
+        Foo(long l) : L(l) {}
+        static void *operator new(size_t size)
+        {
+            return myAlloc.allocate(size);
+        }
+        static void operator delete(void *pdead, size_t size)
+        {
+            myAlloc.deallocate(pdead, size);
+        }
+    };
+    allocator Foo::myAlloc;
+
+    class Goo
+    {
+    public:
+        double D;
+        string str;
+        static allocator myAlloc;
+
+    public:
+        Goo(double d) : D(d) {}
+        static void *operator new(size_t size)
+        {
+            return myAlloc.allocate(size);
+        }
+        static void operator delete(void *pdead, size_t size)
+        {
+            myAlloc.deallocate(pdead, size);
+        }
+    };
+    allocator Goo::myAlloc;
+
 }
 
 int main()
 {
-    Ator1::test();
+    // Ator1::test();
+    // Ator2::test();
     return 0;
 }
