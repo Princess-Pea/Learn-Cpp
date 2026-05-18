@@ -257,6 +257,8 @@ namespace RAII7
         static void operator delete[](void *, size_t);
     };
 
+    // placement new 重载有一个很好的例子，如basic_string类中的operator new[]函数，它允许在分配内存时指定一个额外的参数来增加分配的内存大小，以便在字符串数据前面添加一些额外的信息，例如字符串的长度等。这使得basic_string类能够更高效地管理字符串数据，并且在需要时能够正确地释放内存。
+
     void *Foo::operator new(size_t size)
     {
         Foo *p = (Foo *)malloc(size);
