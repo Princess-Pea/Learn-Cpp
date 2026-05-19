@@ -286,10 +286,33 @@ protected:                                              \
     }
 }
 
+#include <new>
+#include <iostream>
+#include <cassert>
+
+namespace RAII
+{
+    void noMoreMemory()
+    {
+        cerr << "Out of memory!" << endl;
+        abort();
+    }
+
+    void main()
+    {
+        std::set_new_handler(noMoreMemory);
+        int *p = new int[1000000000000];
+        assert(p != nullptr);
+        // p = new int[1000000000000000000];
+        // assert(p != nullptr);
+    }
+}
+
 int main()
 {
     // Ator1::test();
     // Ator2::test();
-    Ator3::test();
+    // Ator3::test();
+    RAII::main();
     return 0;
 }
