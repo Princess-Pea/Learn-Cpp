@@ -263,6 +263,15 @@ protected:                                              \
         DECLARE_POOL_ALLOC() // 宏
     };
 
+    class Hoo
+    {
+    public:
+        Hoo() = default;
+        Hoo(const Hoo &) = delete;
+        Hoo &operator=(const Hoo &) = delete;
+        ~Hoo() = default;
+    };
+
     void test()
     {
         Foo *f[100];
@@ -284,6 +293,12 @@ protected:                                              \
             delete g[i];
         }
     }
+
+    void main()
+    {
+        Hoo a;
+        //! Hoo c = a; // [error] use of deleted function 'Hoo::Hoo(const Hoo&)'
+    }
 }
 
 #include <new>
@@ -301,6 +316,8 @@ namespace RAII
     void main()
     {
         std::set_new_handler(noMoreMemory);
+        // new handler，设置当new操作无法分配内存时调用的函数
+        // 要真正发挥作用，new_handler 应该尝试释放可回收的内存（例如清空缓存、释放不用的资源），然后返回，让 operator new 再次尝试分配内存；若未果，则应该抛出 std::bad_alloc 异常，或者调用 std::abort() 来终止程序。
         int *p = new int[1000000000000];
         assert(p != nullptr);
         // p = new int[1000000000000000000];
