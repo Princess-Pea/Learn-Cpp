@@ -232,6 +232,44 @@ namespace virtual_function
 	}
 }
 
+namespace interface {
+	class Printable {
+	public:
+		virtual std::string GetClassName() = 0; // 纯虚函数
+		virtual ~Printable() = default;         // 虚析构
+	};
+
+	class Entity : public Printable {
+	public:
+		virtual std::string GetName() { return "Entity"; } // 提供默认实现
+		std::string GetClassName() override { return "Entity"; }
+	};
+
+	class Player : public Entity {
+	private:
+		std::string m_Name;
+	public:
+		Player(const std::string& name) : m_Name(name) {}
+		std::string GetName() override { return m_Name; }
+		std::string GetClassName() override { return "Player"; }
+	};
+
+	void Print(Printable* obj) {
+		std::cout << obj->GetClassName() << std::endl;
+	}
+
+	int main() {
+		Entity* e = new Entity;
+		Print(e);
+		delete e;
+
+		Player* p = new Player("Stranger");
+		Print(p);
+		delete p;
+		return 0;
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -241,6 +279,7 @@ int main()
 	// local_static::main();
 	// Ctor_Dtor::main();
 	// inheritance::main();
-	virtual_function::main();
+	// virtual_function::main();
+	interface::main();
 	std::cin.get();
 }
