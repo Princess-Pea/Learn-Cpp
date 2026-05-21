@@ -297,6 +297,34 @@ namespace array
 		}
 }
 
+#include<string>
+namespace String
+{
+	void main()
+	{
+		const char* str = "Syalis"; // C style way to define a string, a is a pointer pointing to a string literal "Syalis" stored in read-only memory. C style strings are null-terminated, meaning they end with a '\0' character to indicate the end of the string. C style strings are not safe to use because they can lead to buffer overflows and other memory issues if not handled carefully.
+		// name[2] = 'a'; // [error] assignment of read-only location 'name[2]'
+		char s[] = "Syalis";
+		//! std::cout << s[]; // [error]
+		std::string name = "Syalis";
+		std::cout << name << std::endl; // string 类实现了对输入输出流的操作符重载
+		name += ",hi!";					// string 类实现了操作符重载
+		std::cout << name << std::endl;
+		name = std::string("Syalis") + ",hi!"; // string 类实现了操作符重载，允许我们直接使用 + 操作符来连接字符串，而不需要像 C 风格字符串那样使用 strcat 函数来连接字符串，这使得代码更简洁和易读。
+		std::cout << name << std::endl;
+		name.find("is") != std::string::npos; // string 类提供了丰富的成员函数来操作字符串，例如find函数可以用来查找子字符串，返回子字符串在字符串中的位置，如果找不到则返回std::string::npos。
+	}
+
+	void PrintString_pass_by_value(std::string s) // 传值方式传递字符串，函数内部会创建一个新的字符串对象，并将实参字符串的内容复制到新对象中，这可能会导致性能问题，尤其是当字符串较大时，因为复制操作需要分配新的内存并复制数据。
+	{
+		std::cout << s << std::endl;
+	}
+	void PrintString_pass_by_reference(const std::string& s) // 传引用方式传递字符串，函数内部不会创建新的字符串对象，而是直接使用实参字符串的引用，这样可以避免不必要的复制操作，提高性能，尤其是当字符串较大时，因为它只需要传递一个指针而不是复制整个字符串。
+	{
+		std::cout << s << std::endl;
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -308,9 +336,7 @@ int main()
 	// inheritance::main();
 	// virtual_function::main();
 	// interface::main();
-	array::main();
-
-
-	
+	// array::main();
+	String::main();
 	std::cin.get();
 }
