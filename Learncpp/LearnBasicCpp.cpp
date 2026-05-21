@@ -270,6 +270,33 @@ namespace interface {
 	}
 }
 
+#include <array>
+namespace array
+{
+	void main()
+	{
+		int* example = new int[5];
+		for (int i = 0; i < 5; i++)
+			example[i] = i;
+
+		static int size3 = 5; // static关键字告诉编译器size3是一个静态变量，虽然它在程序运行期间只有一份内存，但它的值在运行时才确定，因此不能用来定义数组的大小。
+		//! int c[size3]; [error] expression must have a constant value
+		// 只有当size3是编译时常量时，才能用来定义数组的大小，因为数组的大小必须在编译时确定，而不能在运行时动态分配。
+
+		const int size = 5; // const关键字告诉编译器size是一个常量，虽然它在程序运行期间只有一份内存，但它的值在编译时就确定了，因此可以用来定义数组的大小。
+		int a[size]; // 定义一个大小为size的数组，size是一个编译时常量，可以在编译阶段就确定它的值，因此可以用来定义数组的大小。
+
+		static const int size1 = 5; // static const关键字告诉编译器size1是一个静态常量，虽然它在程序运行期间只有一份内存，但它的值在编译时就确定了，因此可以用来定义数组的大小。
+		int b[size1];
+
+		static constexpr int size2 = 5; // constexpr关键字告诉编译器size2是一个编译时常量，可以在编译阶段就确定它的值，因此可以用来定义数组的大小。
+		int c[size2];
+		// const 和 static constexpr 都可以用来定义编译时常量，但constexpr更严格，要求变量必须在编译时就能确定值，而const只要求变量的值在运行时不变，所以constexpr更适合用来定义数组大小等需要编译时常量的场景。
+
+		std::array <int, 5> another; // std::array是一个模板类，提供了一个固定大小的数组，大小在编译时确定，元素类型由模板参数指定。std::array提供了更丰富的成员函数和操作符重载，使得使用起来更方便和安全，同时也支持范围for循环等现代C++特性。
+		}
+}
+
 int main()
 {
 	// pointer::main();
@@ -280,6 +307,10 @@ int main()
 	// Ctor_Dtor::main();
 	// inheritance::main();
 	// virtual_function::main();
-	interface::main();
+	// interface::main();
+	array::main();
+
+
+	
 	std::cin.get();
 }
