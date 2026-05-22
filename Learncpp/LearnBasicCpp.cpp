@@ -7,15 +7,15 @@ namespace pointer
 	void main()
 	{
 		int var = 8;
-		//int* ptr = &var;
-		//double* q = (double*)&var;
+		// int* ptr = &var;
+		// double* q = (double*)&var;
 		//*ptr = 10;
-		//LOG(var);
+		// LOG(var);
 
-		char* buffer = new char[8]; // buffer is a pointer pointing to a block of memory of 8 bytes, which is enough to hold 8 chars
-		memset(buffer, 0, 8); // fill the memory block with 0s, or '\0' in the case of char
+		char *buffer = new char[8]; // buffer is a pointer pointing to a block of memory of 8 bytes, which is enough to hold 8 chars
+		memset(buffer, 0, 8);		// fill the memory block with 0s, or '\0' in the case of char
 
-		char** ptr = &buffer;
+		char **ptr = &buffer;
 
 		delete[] buffer;
 		std::cin.get();
@@ -29,12 +29,12 @@ namespace reference
 		value++;
 	}
 
-	void Increment_ptr(int* value)
+	void Increment_ptr(int *value)
 	{
 		(*value)++;
 	}
 
-	void Increment_ref(int& value)
+	void Increment_ref(int &value)
 	{
 		value++;
 	}
@@ -47,13 +47,12 @@ namespace reference
 		Increment_ref(a);
 
 		int b = 8;
-		int& ref = a;
+		int &ref = a;
 		ref = b; // a = b; => a=8,b=8,ref=8.
 
-
-		//int* b = &a;
-		//int& ref = a; // create an alias for a, ref is another name for a, it refers to the same memory location as a
-		//ref = 2;
+		// int* b = &a;
+		// int& ref = a; // create an alias for a, ref is another name for a, it refers to the same memory location as a
+		// ref = 2;
 
 		LOG(a);
 
@@ -84,7 +83,7 @@ namespace Static
 
 		// 非静态成员函数，本质上传入了一个隐式的this指针，指向调用该函数的对象实例，所以可以访问非静态成员变量和静态成员变量。
 
-		void Print(Entity* e) // 通过传入一个Entity对象指针来访问静态成员变量。虽然静态成员变量不属于对象实例，但可以通过对象实例来访问它们，因为它们在内存中只有一份，所有对象实例共享同一份内存。
+		void Print(Entity *e) // 通过传入一个Entity对象指针来访问静态成员变量。虽然静态成员变量不属于对象实例，但可以通过对象实例来访问它们，因为它们在内存中只有一份，所有对象实例共享同一份内存。
 		{
 			std::cout << e->x << "," << e->y << std::endl;
 		}
@@ -92,7 +91,7 @@ namespace Static
 
 	int Entity::x; // 定义static成员变量，必须在类外定义。如未指定初值，静态成员变量会被默认初始化为0。
 	int Entity::y;
-	
+
 	void main()
 	{
 		Entity e, e1;
@@ -114,10 +113,10 @@ namespace local_static
 	class Singleton
 	{
 	private:
-		static Singleton* s_Instance; // 静态成员变量，属于类本身，在内存中只有一份，所有对象实例共享同一份内存。
+		static Singleton *s_Instance; // 静态成员变量，属于类本身，在内存中只有一份，所有对象实例共享同一份内存。
 	public:
-		static Singleton& Get_ref() { return *s_Instance; } // 返回一个引用
-		static Singleton* Get_ptr() { return s_Instance; } // 返回一个指针
+		static Singleton &Get_ref() { return *s_Instance; } // 返回一个引用
+		static Singleton *Get_ptr() { return s_Instance; }	// 返回一个指针
 		static Singleton &Get()
 		{
 			Singleton instance;
@@ -126,7 +125,7 @@ namespace local_static
 		void Hello() { std::cout << "Hello Singleton!" << std::endl; }
 	};
 
-	Singleton* Singleton::s_Instance; // 定义静态成员变量，必须在类外定义。
+	Singleton *Singleton::s_Instance; // 定义静态成员变量，必须在类外定义。
 
 	void Function()
 	{
@@ -137,8 +136,8 @@ namespace local_static
 	}
 	void main()
 	{
-		//for (int i = 0; i < 5; i++)
-			//Function();
+		// for (int i = 0; i < 5; i++)
+		// Function();
 		Singleton::Get_ref().Hello();
 		Singleton::Get_ptr()->Hello();
 		Singleton::Get().Hello();
@@ -158,10 +157,9 @@ namespace Ctor_Dtor
 		}
 	};
 
-
 	void main()
 	{
-		Entity e{1,2};
+		Entity e{1, 2};
 		e.Print();
 	}
 }
@@ -184,7 +182,7 @@ namespace inheritance
 	class Player : public Entity
 	{
 	public:
-		const char* Name;
+		const char *Name;
 
 		void PrintName()
 		{
@@ -207,63 +205,71 @@ namespace virtual_function
 	{
 	public:
 		virtual std::string GetName() { return "Entity"; } // 声明一个虚函数，告诉编译器在运行时根据对象的实际类型来决定调用哪个函数，而不是在编译时就决定了调用哪个函数。虚函数需要在基类中声明，并且在派生类中重写（override）才能实现多态性。
-		// 本质上，虚函数在编译时会被编译器处理成一个函数指针表（vtable），每个类都有一个vtable，里面存储了该类的虚函数的地址。当通过基类指针调用虚函数时，编译器会根据对���的实际类型来查找对应的vtable，并调用正确的函数实现。
+														   // 本质上，虚函数在编译时会被编译器处理成一个函数指针表（vtable），每个类都有一个vtable，里面存储了该类的虚函数的地址。当通过基类指针调用虚函数时，编译器会根据对���的实际类型来查找对应的vtable，并调用正确的函数实现。
 	};
 
 	class Player : public Entity
 	{
 	private:
 		std::string m_Name;
+
 	public:
-		Player(const std::string& name) : m_Name(name) {}
+		Player(const std::string &name) : m_Name(name) {}
 		std::string GetName() override { return m_Name; } // 重写基类的虚函数，告诉编译器在运行时调用这个函数时，如果对象的实际类型是Player，就调用Player类中的GetName函数，而不是Entity类中的GetName函数。
 	};
 
 	void main()
 	{
-		Entity* e = new Entity();
+		Entity *e = new Entity();
 		std::cout << e->GetName() << std::endl;
 
-		Player* p = new Player("Stranger");
+		Player *p = new Player("Stranger");
 		std::cout << p->GetName() << std::endl; // 为什么输出Stranger？因为Player类重写了Entity类的GetName函数，当通过Player对象调用GetName函数时，实际调用的是Player类中的GetName函数，而不是Entity类中的GetName函数，所以输出Stranger。
 
-		Entity* q = p;
+		Entity *q = p;
 		std::cout << q->GetName() << std::endl; // 为什么输出Stranger？因为Entity类的GetName函数是虚函数，当通过Entity指针调用GetName函数时，编译器会根据对象的实际类型来决定调用哪个函数，而q指向的是一个Player对象，所以实际调用的是Player类中的GetName函数，而不是Entity类中的GetName函数，所以输出Stranger。
 	}
 }
 
-namespace interface {
-	class Printable {
+namespace interface
+{
+	class Printable
+	{
 	public:
 		virtual std::string GetClassName() = 0; // 纯虚函数
-		virtual ~Printable() = default;         // 虚析构
+		virtual ~Printable() = default;			// 虚析构
 	};
 
-	class Entity : public Printable {
+	class Entity : public Printable
+	{
 	public:
 		virtual std::string GetName() { return "Entity"; } // 提供默认实现
 		std::string GetClassName() override { return "Entity"; }
 	};
 
-	class Player : public Entity {
+	class Player : public Entity
+	{
 	private:
 		std::string m_Name;
+
 	public:
-		Player(const std::string& name) : m_Name(name) {}
+		Player(const std::string &name) : m_Name(name) {}
 		std::string GetName() override { return m_Name; }
 		std::string GetClassName() override { return "Player"; }
 	};
 
-	void Print(Printable* obj) {
+	void Print(Printable *obj)
+	{
 		std::cout << obj->GetClassName() << std::endl;
 	}
 
-	int main() {
-		Entity* e = new Entity;
+	int main()
+	{
+		Entity *e = new Entity;
 		Print(e);
 		delete e;
 
-		Player* p = new Player("Stranger");
+		Player *p = new Player("Stranger");
 		Print(p);
 		delete p;
 		return 0;
@@ -275,7 +281,7 @@ namespace array
 {
 	void main()
 	{
-		int* example = new int[5];
+		int *example = new int[5];
 		for (int i = 0; i < 5; i++)
 			example[i] = i;
 
@@ -284,7 +290,7 @@ namespace array
 		// 只有当size3是编译时常量时，才能用来定义数组的大小，因为数组的大小必须在编译时确定，而不能在运行时动态分配。
 
 		const int size = 5; // const关键字告诉编译器size是一个常量，虽然它在程序运行期间只有一份内存，但它的值在编译时就确定了，因此可以用来定义数组的大小。
-		int a[size]; // 定义一个大小为size的数组，size是一个编译时常量，可以在编译阶段就确定它的值，因此可以用来定义数组的大小。
+		int a[size];		// 定义一个大小为size的数组，size是一个编译时常量，可以在编译阶段就确定它的值，因此可以用来定义数组的大小。
 
 		static const int size1 = 5; // static const关键字告诉编译器size1是一个静态常量，虽然它在程序运行期间只有一份内存，但它的值在编译时就确定了，因此可以用来定义数组的大小。
 		int b[size1];
@@ -293,16 +299,16 @@ namespace array
 		int c[size2];
 		// const 和 static constexpr 都可以用来定义编译时常量，但constexpr更严格，要求变量必须在编译时就能确定值，而const只要求变量的值在运行时不变，所以constexpr更适合用来定义数组大小等需要编译时常量的场景。
 
-		std::array <int, 5> another; // std::array是一个模板类，提供了一个固定大小的数组，大小在编译时确定，元素类型由模板参数指定。std::array提供了更丰富的成员函数和操作符重载，使得使用起来更方便和安全，同时也支持范围for循环等现代C++特性。
-		}
+		std::array<int, 5> another; // std::array是一个模板类，提供了一个固定大小的数组，大小在编译时确定，元素类型由模板参数指定。std::array提供了更丰富的成员函数和操作符重载，使得使用起来更方便和安全，同时也支持范围for循环等现代C++特性。
+	}
 }
 
-#include<string>
+#include <string>
 namespace String
 {
 	void main()
 	{
-		const char* str = "Syalis"; // C style way to define a string, a is a pointer pointing to a string literal "Syalis" stored in read-only memory. C style strings are null-terminated, meaning they end with a '\0' character to indicate the end of the string. C style strings are not safe to use because they can lead to buffer overflows and other memory issues if not handled carefully.
+		const char *str = "Syalis"; // C style way to define a string, a is a pointer pointing to a string literal "Syalis" stored in read-only memory. C style strings are null-terminated, meaning they end with a '\0' character to indicate the end of the string. C style strings are not safe to use because they can lead to buffer overflows and other memory issues if not handled carefully.
 		// name[2] = 'a'; // [error] assignment of read-only location 'name[2]'
 		char s[] = "Syalis";
 		//! std::cout << s[]; // [error]
@@ -319,38 +325,89 @@ namespace String
 	{
 		std::cout << s << std::endl;
 	}
-	void PrintString_pass_by_reference(const std::string& s) // 传引用方式传递字符串，函数内部不会创建新的字符串对象，而是直接使用实参字符串的引用，这样可以避免不必要的复制操作，提高性能，尤其是当字符串较大时，因为它只需要传递一个指针而不是复制整个字符串。
+	void PrintString_pass_by_reference(const std::string &s) // 传引用方式传递字符串，函数内部不会创建新的字符串对象，而是直接使用实参字符串的引用，这样可以避免不必要的复制操作，提高性能，尤其是当字符串较大时，因为它只需要传递一个指针而不是复制整个字符串。
 	{
 		std::cout << s << std::endl;
 	}
 }
 
-#include<stdlib.h>
+#include <stdlib.h>
 namespace string_literals
 {
 	void main()
 	{
-		const char* name = "Syalis";
+		const char *name = "Syalis";
 		//! s[2] = 'a'; // [error] assignment of read-only location 's[2]'.
 		//! char* n = "Syalis"; // [error] 未定义行为，因为字符串字面值 "Syalis" 存储在只读内存中。
-		char* n = (char*)"Syalis"; // 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Syalis" 存储在只读内存中，虽然编译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
-		n[2] = 'a'; // 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Syalis" 存储在只读内存中，虽然编译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
+		char *n = (char *)"Syalis"; // 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Syalis" 存储在只读内存中，虽然编译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
+		n[2] = 'a';					// 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Syalis" 存储在只读内存中，虽然编译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
 		char s[] = "Syalis";
 		s[2] = 'a'; // 这种方式定义的字符串是一个字符数组，存储在可读写的内存中，可以修改其中的字符，因为它是一个数组，而不是一个指针指向的字符串字面值。
 
-		const wchar_t* wname = L"Syalis"; // L前缀表示宽字符字符串字面值，wname是一个指针，指向一个宽字符字符串字面值 "Syalis".
-		const char16_t* u16name = u"Syalis"; // u前缀表示UTF-16字符串字面值，u16name是一个指针，指向一个UTF-16字符串字面值 "Syalis".
-		const char32_t* u32name = U"Syalis"; // U前缀表示UTF-32字符串字面值，u32name是一个指针，指向一个UTF-32字符串字面值 "Syalis".
+		const wchar_t *wname = L"Syalis";	 // L前缀表示宽字符字符串字面值，wname是一个指针，指向一个宽字符字符串字面值 "Syalis".
+		const char16_t *u16name = u"Syalis"; // u前缀表示UTF-16字符串字面值，u16name是一个指针，指向一个UTF-16字符串字面值 "Syalis".
+		const char32_t *u32name = U"Syalis"; // U前缀表示UTF-32字符串字面值，u32name是一个指针，指向一个UTF-32字符串字面值 "Syalis".
 
 		using namespace std::string_literals; // 引入字符串字面值命名空间，允许我们使用s后缀来定义std::string类型的字符串字面值。
-		std::string name1 = "Syalis"s; // s后缀实际上是调用了std::string的构造函数，将字符串字面值 "Syalis" 转换为一个std::string对象，这样我们就可以直接使用字符串字面值来初始化std::string对象，而不需要显式地调用构造函数。
-		name1 = "Syalis"s + ",hi!"; // s后缀允许我们直接使用 + 操作符来连接字符串字面值和std::string对象，这样可以更方便地构建字符串，而不需要像 C 风格字符串那样使用 strcat 函数来连接字符串。
+		std::string name1 = "Syalis"s;		  // s后缀实际上是调用了std::string的构造函数，将字符串字面值 "Syalis" 转换为一个std::string对象，这样我们就可以直接使用字符串字面值来初始化std::string对象，而不需要显式地调用构造函数。
+		name1 = "Syalis"s + ",hi!";			  // s后缀允许我们直接使用 + 操作符来连接字符串字面值和std::string对象，这样可以更方便地构建字符串，而不需要像 C 风格字符串那样使用 strcat 函数来连接字符串。
 
-		const char* example = R"(line1
+		const char *example = R"(line1
 	Line2
 	Line3
-	Line4)"; // R前缀表示原始字符串字面值，R"( ... )"中的内容会被原样保留，包括换行符和制表符等特殊字符，这使得定义多行字符串变得非常方便，而不需要使用转义字符来表示换行符或其他特殊字符。
+	Line4)";							   // R前缀表示原始字符串字面值，R"( ... )"中的内容会被原样保留，包括换行符和制表符等特殊字符，这使得定义多行字符串变得非常方便，而不需要使用转义字符来表示换行符或其他特殊字符。
 		std::cout << example << std::endl; // 输出时会保留原始字符串中的格式，包括换行符和制表符等特殊字符���因此输出结果会按照原始字符串的格式显示
+	}
+	const char *ex = "Line1\n"
+					 "Line2\n"
+					 "Line3\n"; // 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Line1\nLine2\nLine3\n" 存储在只读内存中，虽然��译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
+}
+
+namespace Const
+{
+	class Entity
+	{
+	private:
+		int X, Y;
+		int *m_X, m_Y;	 // 注意这里m_X是一个指针，m_Y是一个整数，虽然它们在同一行声明，但它们的类型不同，m_X是一个指向整数的指针，而m_Y是一个整数。
+		mutable int var; // mutable关键字告诉编译器这个成员变量可以在const成员函数中被修改，即使这个成员变量属于一个const对象。这是因为有些成员变量可能需要在对象的生命周期内被修改，但又不应该影响对象的外部状态，例如缓存、统计信息等。使用mutable关键字可以允许这些成员变量在const成员函数中被修改，而不会违反const对象的不可变性原则。
+	public:
+		int GetX() const // const成员函数，表示这个函数不会修改对象的状态，可以在const对象上调用。
+		{
+			//! m_X = 5; // [error] assignment of member 'Const::Entity::m_X' in read-only object
+			var = 2; // mutable成员变量可以在const成员函数中被修改，即使这个成员变量属于一个const对象。
+			return X;
+		}
+		void SetX(int x) { X = x; }		// 非const成员函数，表示这个函数可能会修改对象的状态，不能在const对象上调用。
+		const int *const Getm_X() const // const成员函数，返回一个指向常量的常量指针，表示这个函数不会修改对象的状态，并且返回的指针指向的内容也是一个常量，不能通过这个指针来修改它所指向的内容。
+		{
+			return m_X;
+		}
+	};
+
+	void PrintEntity(const Entity &e) // 传递一个const Entity对象的引用，表示这个函数不会修改传入的Entity对象，但可以接受const对象和非const对象作为实参。
+	{
+		std::cout << e.GetX() << std::endl; // 在函数内部调用Entity对象的const成员函数GetX()，因为这个函数不会修改对象的状态，所以可以在const对象上调用。
+	}
+
+	void main()
+	{
+		const int MAX = 100;
+		//! MAX = 1000; // [error] assignment of read-only variable 'a'.
+		int *a = new int;
+		*a = 5;
+		a = (int *)&MAX;
+		std::cout << *a << std::endl;
+
+		const int *b = new int; // 等价于 int const* b.  const修饰指针指向的内容，表示指针b指向的内容是一个常量，不能通过b来修改它所指向的内容，但可以改变b本身的值，让它指向其他地址。
+		//! *b = 5; // [error] assignment of read-only location '*b'.
+		b = &MAX; // 这种方式定义的指针b是一个指向常量的指针，虽然编译器允许这样定义，但在运行时修改指针b的值会导致未定义行为，因为它试图修改只读内存中的数据。
+
+		int *const c = new int; // const修饰指针本身，表示指针c是一个常量指针，必须在定义时初始化，并且之后不能改变它的值，即不能让c指向其他地址，但可以通过c来修改它所指向的内容。
+		*c = 5;
+		//! c = &MAX; // [error] assignment of read-only variable 'c'.
+
+		const int *const d = new int; // const修饰指针本身和指针指向的内容，表示指针d是一个常量指针，必须在定义时初始化，并且之后不能改变它的值，即不能让d指向其他地址，同时d指向的内容也是一个常量，不能通过d来修改它所指向的内容。
 	}
 }
 
@@ -367,5 +424,7 @@ int main()
 	// interface::main();
 	// array::main();
 	// String::main();
+	// string_literals::main();
+	Const::main();
 	std::cin.get();
 }
