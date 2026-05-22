@@ -411,6 +411,58 @@ namespace Const
 	}
 }
 
+namespace Initializer_list
+{
+	class Example
+	{
+	public:
+		Example()
+		{
+			std::cout << "created Example!" << std::endl;
+		}
+
+		Example(int x)
+		{
+			std::cout << "created Example with value: " << x << std::endl;
+		}
+	};
+
+	class Entity
+	{
+	private:
+		std::string name;
+		Example exp;
+
+	public:
+		Entity()
+		{
+			name = std::string("Unknowm");
+			exp = Example(8);
+		}
+	};
+
+	class entity
+	{
+	private:
+		std::string name;
+		Example exp;
+
+	public:
+		entity() : exp(8) // 等价于写成 exp = Example(8)
+		// 使用成员初始化列表来初始化exp成员变量，直接调用Example类的构造函数来创建一个Example对象，并将其赋值给exp成员变量，这样可以避免在构造函数体内先调用默认构造函数创建一个临时对象，然后再通过赋值操作来修改它的状态，这样做更高效，因为它直接在成员变量上构造对象，而不是先构造一个临时对象再赋值。
+		{
+			name = std::string("Unknowm");
+		}
+	};
+
+	void main()
+	{
+		Entity E;
+		std::cout << "--------------------------" << std::endl;
+		entity e;
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -425,6 +477,7 @@ int main()
 	// array::main();
 	// String::main();
 	// string_literals::main();
-	Const::main();
+	// Const::main();
+	Initializer_list::main();
 	std::cin.get();
 }
