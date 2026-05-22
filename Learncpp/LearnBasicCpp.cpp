@@ -325,6 +325,35 @@ namespace String
 	}
 }
 
+#include<stdlib.h>
+namespace string_literals
+{
+	void main()
+	{
+		const char* name = "Syalis";
+		//! s[2] = 'a'; // [error] assignment of read-only location 's[2]'.
+		//! char* n = "Syalis"; // [error] 未定义行为，因为字符串字面值 "Syalis" 存储在只读内存中。
+		char* n = (char*)"Syalis"; // 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Syalis" 存储在只读内存中，虽然编译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
+		n[2] = 'a'; // 这种方式定义的字符串是一个指针，指向一个字符串字面值 "Syalis" 存储在只读内存中，虽然编译器允许这样定义，但在运行时修改字符串内容会导致未定义行为，因为它试图修改只读内存中的数据。
+		char s[] = "Syalis";
+		s[2] = 'a'; // 这种方式定义的字符串是一个字符数组，存储在可读写的内存中，可以修改其中的字符，因为它是一个数组，而不是一个指针指向的字符串字面值。
+
+		const wchar_t* wname = L"Syalis"; // L前缀表示宽字符字符串字面值，wname是一个指针，指向一个宽字符字符串字面值 "Syalis".
+		const char16_t* u16name = u"Syalis"; // u前缀表示UTF-16字符串字面值，u16name是一个指针，指向一个UTF-16字符串字面值 "Syalis".
+		const char32_t* u32name = U"Syalis"; // U前缀表示UTF-32字符串字面值，u32name是一个指针，指向一个UTF-32字符串字面值 "Syalis".
+
+		using namespace std::string_literals; // 引入字符串字面值命名空间，允许我们使用s后缀来定义std::string类型的字符串字面值。
+		std::string name1 = "Syalis"s; // s后缀实际上是调用了std::string的构造函数，将字符串字面值 "Syalis" 转换为一个std::string对象，这样我们就可以直接使用字符串字面值来初始化std::string对象，而不需要显式地调用构造函数。
+		name1 = "Syalis"s + ",hi!"; // s后缀允许我们直接使用 + 操作符来连接字符串字面值和std::string对象，这样可以更方便地构建字符串，而不需要像 C 风格字符串那样使用 strcat 函数来连接字符串。
+
+		const char* example = R"(line1
+	Line2
+	Line3
+	Line4)"; // R前缀表示原始字符串字面值，R"( ... )"中的内容会被原样保留，包括换行符和制表符等特殊字符，这使得定义多行字符串变得非常方便，而不需要使用转义字符来表示换行符或其他特殊字符。
+		std::cout << example << std::endl; // 输出时会保留原始字符串中的格式，包括换行符和制表符等特殊字符���因此输出结果会按照原始字符串的格式显示
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -337,6 +366,6 @@ int main()
 	// virtual_function::main();
 	// interface::main();
 	// array::main();
-	String::main();
+	// String::main();
 	std::cin.get();
 }
