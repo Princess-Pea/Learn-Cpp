@@ -575,6 +575,67 @@ namespace Implict_Explicit
 	}
 }
 
+namespace OPERATORS_AND_OVERLOAD
+{
+	struct Vector2
+	{
+		float x, y;
+
+		Vector2(float x, float y) : x(x), y(y) {}
+
+		Vector2 Add(const Vector2 &other) const
+		{
+			return Vector2(x + other.x, y + other.y);
+		}
+
+		Vector2 operator+(const Vector2 &other) const // 重载加法运算符，使得我们可以直接使用 + 操作符来进行向量的加法运算，而不需要显式地调用Add函数，这样代码更简洁和易读。
+		{
+			return Vector2(x + other.x, y + other.y);
+		}
+
+		Vector2 Multiply(const Vector2 &other) const
+		{
+			return Vector2(x * other.x, y * other.y);
+		}
+		Vector2 operator*(const Vector2 &other) const // 重载乘法运算符，使得我们可以直接使用 * 操作符来进行向量的乘法运算，而不需要显式地调用Multiply函数，这样代码更简洁和易读。
+		{
+			return Vector2(x * other.x, y * other.y);
+		}
+
+		bool operator==(const Vector2 &other) const // 重载等于运算符，使得我们可以直接使用 == 操作符来比较两个Vector2对象是否相等，而不需要显式地调用一个函数来进行比较，这样代码更简洁和易读。
+		{
+			return x == other.x && y == other.y;
+		}
+
+		// 本质上操作符就是函数，当我们使用 + 操作符时，编译器会将其转换为对 operator+ 函数的调用，例如 a + b 会被转换为 a.operator+(b)，同样的，a * b 会被转换为 a.operator*(b)，这样我们就可以通过重载这些运算符来定义它们在我们自定义类型上的行为，使得代码更自然和易读。
+
+		void show()
+		{
+			std::cout << x << ", " << y << std::endl;
+		}
+	};
+
+	std::ostream &operator<<(std::ostream &stream, const Vector2 &other)
+	{
+		stream << other.x << ", " << other.y;
+		return stream;
+	}
+
+	void main()
+	{
+		Vector2 pos(3.0f, 4.0f);
+		Vector2 speed(0.5f, 1.0f);
+		Vector2 powerup(1.1f, 1.1f);
+
+		Vector2 result = pos.Add((speed).Multiply(powerup)); // 先计算speed和powerup的乘积，得到一个新的Vector2对象，然后再将这个对象与pos进行加法运算，得到最终的结果。
+		Vector2 result2 = pos + speed * powerup;			 // 由于我们重载了加法和乘法运算符，所以我们可以直接使用 + 和 * 操作符来进行向量的加法和乘法运算
+
+		result.show();
+		if (result2 == result)
+			std::cout << result2 << std::endl; // 由于我们重载了输出流运算符，所以我们可以直接使用 << 操作符来输出Vector2对象，这样代码更简洁和易读。
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -593,6 +654,7 @@ int main()
 	// Initializer_list::main();
 	// CREATE_INSTANTIATE_OBJECT::main();
 	// New::main();
-	Implict_Explicit::main();
+	// Implict_Explicit::main();
+	OPERATORS_AND_OVERLOAD::main();
 	std::cin.get();
 }
