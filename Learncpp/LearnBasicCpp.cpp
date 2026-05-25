@@ -488,7 +488,7 @@ namespace CREATE_INSTANTIATE_OBJECT
 	void main()
 	{
 		Entity *e;
-		// 演示在栈上创建对象和在堆上创建对象的区别。
+		// 演示在栈上创建对象和在堆上创建对象的区别
 		{
 			Entity entity("Syalis");
 			// 能在栈上创建对象就在栈上创建对象，因为栈上的对象会在离开作用域时自动销毁，避免了内存泄漏的问题;
@@ -504,6 +504,36 @@ namespace CREATE_INSTANTIATE_OBJECT
 			delete entity; // 手动释放内存，避免内存泄漏。
 		}
 		delete e;
+	}
+}
+
+namespace New
+{
+	using string = std::string;
+
+	class Entity
+	{
+	private:
+		string name;
+
+	public:
+		Entity() : name("Unknown") {}
+		Entity(const string &name) : name(name) {}
+
+		const string &GetName() const { return name; }
+	};
+
+	void main()
+	{
+		int a = 2;
+		int *b = new int;
+		int *c = new int[50];
+
+		Entity *e = new Entity("Syalis");
+		//! Entity* e = (Entity*)malloc(sizeof(Entity)); // C style 方式使用malloc函数来动态分配内存，但我们在 C++ 中一般不这样写，因为它不会调用构造函数来初始化对象，因此需要手动调用构造函数来初始化对象，这样做比较麻烦，而且容易出错，因为如果忘记调用构造函数或者调用了错误的构造函数，可能会导致对象状态不正确或者内存泄漏等问题。
+		delete e;
+		delete b;
+		delete[] c;
 	}
 }
 
@@ -523,6 +553,8 @@ int main()
 	// string_literals::main();
 	// Const::main();
 	// Initializer_list::main();
-	CREATE_INSTANTIATE_OBJECT::main();
+	// CREATE_INSTANTIATE_OBJECT::main();
+	// New::main();
+
 	std::cin.get();
 }
