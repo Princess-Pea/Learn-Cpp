@@ -449,7 +449,7 @@ namespace Initializer_list
 
 	public:
 		entity() : exp(8) // 等价于写成 exp = Example(8)
-		// 使用成员初始化列表来初始化exp成员变量，直接调用Example类的构造函数来创建一个Example对象，并将其赋值给exp成员变量，这样可以避免在构造函数体内先调用默认构造函数创建一个临时对象，然后再通过赋值操作来修改它的状态，这样做更高效，因为它直接在成员变量上构造对象，而不是先构造一个临时对象再赋值。
+						  // 使用成员初始化列表来初始化exp成员变量，直接调用Example类的构造函数来创建一个Example对象，并将其赋值给exp成员变量，这样可以避免在构造函数体内先调用默认构造函数创建一个临时对象，然后再通过赋值操作来修改它的状态，这样做更高效，因为它直接在成员变量上构造对象，而不是先构造一个临时对象再赋值。
 		{
 			name = std::string("Unknowm");
 		}
@@ -460,6 +460,50 @@ namespace Initializer_list
 		Entity E;
 		std::cout << "--------------------------" << std::endl;
 		entity e;
+	}
+}
+
+namespace CREATE_INSTANTIATE_OBJECT
+{
+	using string = std::string;
+
+	class Entity
+	{
+	private:
+		string name;
+
+	public:
+		Entity() : name("Unknown") {}
+		Entity(const string &name) : name(name) {}
+
+		const string &GetName() const { return name; }
+	};
+
+	void Function()
+	{
+		int a = 2;
+		Entity entity; // 在栈上创建了一个Entity对象，当Function函数结束时，entity对象会自动销毁，释放它占用的内存。
+	}
+
+	void main()
+	{
+		Entity *e;
+		// 演示在栈上创建对象和在堆上创建对象的区别。
+		{
+			Entity entity("Syalis");
+			// 能在栈上创建对象就在栈上创建对象，因为栈上的对象会在离开作用域时自动销毁，避免了内存泄漏的问题;
+			// 同时，栈上的对象访问速度更快，因为它们的内存分配和释放由编译器自动管理，不需要像堆上的对象那样进行动态内存分配和释放。
+			std::cout << entity.GetName() << std::endl;
+			e = &entity;
+		}
+		{
+			Entity *entity = new Entity("Syalis");
+			// 在堆上创建对象需要使用new运算符来动态分配内存，并且需要手动释放内存，否则会导致内存泄漏。
+			std::cout << entity->GetName() << std::endl;
+			e = entity;
+			delete entity; // 手动释放内存，避免内存泄漏。
+		}
+		delete e;
 	}
 }
 
@@ -478,6 +522,7 @@ int main()
 	// String::main();
 	// string_literals::main();
 	// Const::main();
-	Initializer_list::main();
+	// Initializer_list::main();
+	CREATE_INSTANTIATE_OBJECT::main();
 	std::cin.get();
 }
