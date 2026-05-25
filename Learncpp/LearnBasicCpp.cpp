@@ -537,6 +537,44 @@ namespace New
 	}
 }
 
+namespace Implict_Explicit
+{
+	using string = std::string;
+
+	class Entity
+	{
+	private:
+		string name;
+		int age;
+		bool sex;
+
+	public:
+		Entity(const string &name) : name(name), age(-1), sex(true) {}
+		Entity(int age) : name("Unknown"), age(age), sex(true) {}
+		explicit Entity(bool s) : name("Unknown"), age(-1), sex(s) {} // explicit关键字告诉编译器这个构造函数是一个显式构造函数，禁止隐式类型转换，只有当我们显式地调用这个构造函数时才会进行类型转换，而不会在需要Entity对象的地方自动将bool类型转换为Entity对象，这样可以避免一些不必要的类型转换和潜在的错误。
+
+		const string &GetName() const { return name; }
+		const int &GetAge() const { return age; }
+	};
+
+	void PrintEntity(const Entity &e)
+	{
+		std::cout << "name: " << e.GetName() << std::endl
+				  << "age: " << e.GetAge() << std::endl;
+	}
+
+	void main()
+	{
+		Entity a = string("Syalis"); // 这里发生了隐式类型转换，编译器会自动将string("Syalis")转换为Entity对象，调用Entity类的构造函数来创建一个Entity对象，并将其赋值给a变量，这样我们就可以直接使用字符串字面值来初始化Entity对象，而不需要显式地调用构造函数。
+		// 等价于 Entity a("Syalis");
+		Entity b = 18;
+		// 等价于 Entity b(18);
+		PrintEntity(18);
+		// 等价于 PrintEntity(Entity(18));
+		//! Entity c = true; // [error] 因为Entity类的构造函数Entity(bool s)被声明为explicit，所以编译器禁止隐式类型转换，不能直接将bool类型转换为Entity对象来初始化c变量，必须显式地调用构造函数来创建一个Entity对象，例如 Entity c(true); 这样才能成功编译。
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -555,6 +593,6 @@ int main()
 	// Initializer_list::main();
 	// CREATE_INSTANTIATE_OBJECT::main();
 	// New::main();
-
+	Implict_Explicit::main();
 	std::cin.get();
 }
