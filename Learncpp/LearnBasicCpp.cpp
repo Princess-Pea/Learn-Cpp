@@ -636,6 +636,70 @@ namespace OPERATORS_AND_OVERLOAD
 	}
 }
 
+namespace This
+{
+	class Entity
+	{
+	public:
+		int x, y;
+
+		Entity(int x, int y)
+		{
+			//! x = x; // 这里的x和y是成员变量，但由于参数名和成员变量名相同，所以编译器会优先使用参数名来解析x和y,因此这里的x和y实际上是指向参数的，而不是成员变量，所以这段代码没有正确地初始化成员变量。
+			this->x = x; // this指针是一个隐式参数，指向调用成员函数的对象实例，通过this指针可以访问对象的成员变量和成员函数，在构造函数中使用this指针来区分成员变量和参数名相同的情况，正确地初始化成员变量。
+			this->y = y;
+			// 相当于 Entity* e = this; e->x = x; e->y = y;
+		}
+
+		int GetX() const
+		{
+			//! Entity *e = this; // [error] invalid use of 'this' outside of a non-static member function
+			const Entity *e = this;
+			return x;
+		}
+	};
+}
+
+#include <memory>		// memory头文件包含了智能指针，例如std::unique_ptr, std::shared_ptr, std::weak_ptr等智能指针类型.这些智能指针提供了自动内存管理的功能，可以帮助我们避免内存泄漏和悬空指针等问题，同时也提供了更安全和方便的内存管理方式。
+namespace Smart_Pointer // std::unique_ptr, std::shared_ptr, std::weak_ptr
+{
+	class Entity
+	{
+	public:
+		Entity()
+		{
+			std::cout << "Entity created!" << std::endl;
+		}
+		~Entity()
+		{
+			std::cout << "Entity destroyed!" << std::endl;
+		}
+		void Print() {}
+	};
+
+	void main()
+	{
+		{
+			std::unique_ptr<Entity> entity0(new Entity());
+			std::unique_ptr<Entity> entity = std::make_unique<Entity>();
+			// 二者区别在于第一种方式需要手动调用new运算符来创建对象，并且需要手动释放内存，而第二种方式使用了std::make_unique函数来创建对象，std::make_unique函数会自动调用new运算符来创建对象，并且会自动管理内存，当智能指针超出作用域时会自动释放内存，避免了内存泄漏的问题，同时也提供了更安全和方便的内存管理方式。
+			//! std::unique_ptr<Entity> e = entity; // [error] use of deleted function 'std::unique_ptr<Entity>::unique_ptr(const std::unique_ptr<Entity>&)'，即它的拷贝构造函数被删除了。
+			// std::unique_ptr是一个独占所有权的智能指针，不能被复制，只能被移动，所以我们不能将一个std::unique_ptr对象赋值给另一个std::unique_ptr对象，这样会导致编译错误。
+			entity0->Print();
+			entity->Print();
+		}
+
+		std::shared_ptr<Entity> e0;
+		std::weak_ptr<Entity> e_w;
+		{
+			std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>();
+			e0 = sharedEntity; // std::shared_ptr是一个共享所有权的智能指针，可以被复制和赋值，所以我们可以将一个std::shared_ptr对象赋值给另一个std::shared_ptr对象，这样它们就共享同一个对象的所有权，当最后一个std::shared_ptr对象被销毁时，才会真正释放内存。
+			// 本质上使用了一个引用计数机制来管理对象的生命周期，每当一个std::shared_ptr对象被复制时，引用计数会增加，当一个std::shared_ptr对象被销毁时，引用计数会减少，当引用计数为0时，才会真正释放内存。
+			e_w = sharedEntity; // std::weak_ptr是一个弱引用的智能指针，它不拥有对象的所有权，只是一个观察者，可以用来观察一个std::shared_ptr对象是否还存在，但不能直接访问它所指向的对象，如果需要访问对象，需要先将std::weak_ptr对象转换为std::shared_ptr对象，这样可以避免循环引用的问题，因为std::weak_ptr不会增加引用计数，所以当最后一个std::shared_ptr对象被销毁时，std::weak_ptr对象也会自动失效，不会导致内存泄漏。
+		}
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -655,6 +719,8 @@ int main()
 	// CREATE_INSTANTIATE_OBJECT::main();
 	// New::main();
 	// Implict_Explicit::main();
-	OPERATORS_AND_OVERLOAD::main();
+	// OPERATORS_AND_OVERLOAD::main();
+	// This::main();
+	Smart_Pointer::main();
 	std::cin.get();
 }
