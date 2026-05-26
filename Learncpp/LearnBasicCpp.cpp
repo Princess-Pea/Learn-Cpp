@@ -13,7 +13,7 @@ namespace pointer
 		// LOG(var);
 
 		char *buffer = new char[8]; // buffer is a pointer pointing to a block of memory of 8 bytes, which is enough to hold 8 chars
-		memset(buffer, 0, 8);		// fill the memory block with 0s, or '\0' in the case of char
+		// memset(buffer, 0, 8);		// fill the memory block with 0s, or '\0' in the case of char
 
 		char **ptr = &buffer;
 
@@ -700,6 +700,81 @@ namespace Smart_Pointer // std::unique_ptr, std::shared_ptr, std::weak_ptr
 	}
 }
 
+#include <string.h>
+namespace Copying
+{
+	class String
+	{
+	private:
+		char *m_Buffer;
+		unsigned int m_Size;
+
+	public:
+		String(const char *string)
+		{
+			m_Size = strlen(string);
+			m_Buffer = new char[m_Size + 1];
+			memcpy(m_Buffer, string, m_Size); // 等价于 for (unsigned int i = 0; i < m_Size; i++) m_Buffer[i] = string[i];
+			m_Buffer[m_Size] = '\0';
+		}
+
+		// String(const String& other) : m_Buffer(other.m_Buffer), m_Size(other.m_Size) {} // 默认的拷贝构造函数，编译器会自动生成一个默认的拷贝构造函数来进行成员逐个复制，这样就会导致string1和second对象的m_Buffer指针指向同一块内存，当其中一个对象被销毁时，另一个对象的m_Buffer指针就会变成悬空指针，导致未定义行为。
+
+		// String(const String& other)
+		//{
+		//	memcpy(this, &other, sizeof(String)); // 默认拷贝构造函数的等价实现
+		//}
+
+		String(const String &other) : m_Size(other.m_Size)
+		// 拷贝构造函数，参数是一个const String对象的引用，表示这个函数不会修改传入的String对象，但可以接受const对象和非const对象作为实参。这就是所谓的深拷贝。
+		{
+			std::cout << "Copying String!" << std::endl;
+			m_Buffer = new char[m_Size + 1];
+			memcpy(m_Buffer, other.m_Buffer, m_Size + 1);
+		}
+
+		~String()
+		{
+			delete[] m_Buffer;
+			m_Buffer = nullptr;
+		}
+
+		char &operator[](unsigned int index) // 重载下标运算符，使得我们可以直接使用 [] 操作符来访问字符串中的字符，而不需要显式地调用一个函数来进行访问，这样代码更简洁和易读。
+		{
+			return m_Buffer[index];
+		}
+
+		friend std::ostream &operator<<(std::ostream &stream, const String &str);
+	};
+
+	std::ostream &operator<<(std::ostream &stream, const String &str)
+	{
+		stream << str.m_Buffer;
+		return stream;
+	}
+
+	void PrintString_by_value(String s)
+	{
+		std::cout << s << std::endl;
+	}
+
+	void PrintString(const String &s)
+	{
+		std::cout << s << std::endl;
+	}
+
+	void main()
+	{
+		String string1 = "Syalis";
+		String second = string1; // 这里发生了隐式的拷贝构造（也就是所谓的浅拷贝），编译器会自动生成一个默认的拷贝构造函数来进行成员逐个复制，这样就会导致string1和second对象的m_Buffer指针指向同一块内存，当其中一个对象被销毁时，另一个对象的m_Buffer指针就会变成悬空指针，导致未定义行为。
+
+		second[2] = 'e';
+
+		PrintString(string1);
+		PrintString(second);
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -721,6 +796,7 @@ int main()
 	// Implict_Explicit::main();
 	// OPERATORS_AND_OVERLOAD::main();
 	// This::main();
-	Smart_Pointer::main();
+	// Smart_Pointer::main();
+	Copying::main();
 	std::cin.get();
 }
