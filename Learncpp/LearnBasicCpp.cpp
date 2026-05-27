@@ -775,6 +775,57 @@ namespace Copying
 	}
 }
 
+namespace Arrow_Operator
+{
+	class Entity
+	{
+	public:
+		int x;
+		void Print() const
+		{
+			std::cout << "Hello, I'm an Entity!" << std::endl;
+		}
+	};
+
+	class Scopedptr
+	{
+	private:
+		Entity *m_Obj;
+
+	public:
+		Scopedptr(Entity *obj) : m_Obj(obj) {}
+		~Scopedptr() { delete m_Obj; }
+
+		Entity *operator->() { return m_Obj; }
+		// 重载箭头运算符，使得我们可以直接使用 -> 操作符来访问Scopedptr对象所管理的Entity对象的成员函数和成员变量，而不需要显式地调用一个函数来进行访问Entity对象的成员函数和成员变量，这样代码更简洁和易读。
+
+		const Entity *operator->() const { return m_Obj; } // const版本的箭头运算符重载
+	};
+
+	struct Vector3
+	{
+		float x, z, y;
+	};
+
+	void main()
+	{
+		Scopedptr entity = new Entity(); // 等价于 Scopedptr entity(new Entity());
+		// 本质上发生了隐式类型转换，编译器会自动将new Entity()转换为一个Scopedptr对象，调用Scopedptr类的构造函数来创建一个Scopedptr对象，并将其赋值给对象的Entity成员变量，这样我们就可以直接使用new Entity()来初始化Scopedptr对象，而不需要显式地调用构造函数。
+		entity->x;
+		entity->Print();
+		// 由于我们重载了箭头运算符，所以我们可以直接使用 -> 操作符来访问Scopedptr对象所管理的Entity对象的成员函数和成员变量。
+		int offset = (int)&(((Vector3 *)0)->x);
+		// 也就是 &((Vector3 *)nullptr)->x; ，将一个空指针转换为一个Vector3类型的指针，然后访问它的x成员变量，并取地址以获得其在结构体中的偏移量，例如 offsetof(Vector3, x) 就是通过这种方式来实现的。
+		// 虽然这种方式在运行时会导致未定义行为，因为它试图访问一个空指针所指向的内存，但在编译时是合法的，因为编译器只会检查语法和类型，而不会检查运行时的内存访问是否合法。
+		std::cout << "Offset of x in Vector3: " << offset << std::endl;
+		int offset_y = (int)&(((Vector3 *)0)->y);
+		int offset_z = (int)&(((Vector3 *)0)->z);
+		std::cout << "Offset of y in Vector3: " << offset_y << std::endl;
+		std::cout << "Offset of z in Vector3: " << offset_z << std::endl;
+		// 获得偏移量是为在一些特定的场景下需要知道结构体成员在内存中的位置，例如在序列化、反序列化或者与底层硬件交互时，可能需要知道结构体成员的偏移量来正确地访问和操作数据。
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -797,6 +848,7 @@ int main()
 	// OPERATORS_AND_OVERLOAD::main();
 	// This::main();
 	// Smart_Pointer::main();
-	Copying::main();
+	// Copying::main();
+	Arrow_Operator::main();
 	std::cin.get();
 }
