@@ -826,6 +826,43 @@ namespace Arrow_Operator
 	}
 }
 
+#include <vector>
+namespace vector
+{
+	struct Vertex
+	{
+		float x, y, z;
+	};
+
+	std::ostream &operator<<(std::ostream &stream, const Vertex &v)
+	{
+		stream << v.x << ", " << v.y << ", " << v.z;
+		return stream;
+	}
+
+	void Function(const std::vector<Vertex> &vertices) {}
+	// 尽可能使用const引用来传递vector对象，这样可以避免不必要的复制操作，提高性能，尤其是当vector对象较大时，因为复制一个vector对象可能会涉及到大量的内存分配和数据复制，而使用const引用则只需要传递一个指针，避免了这些开销。
+
+	void main()
+	{
+		std::vector<Vertex> vertices; // 直接储存Vertex对象比存储指针更高效。它在内存上是连续的，这样可以更好地利用CPU缓存，提高访问速度，并避免了额外的内存分配和指针解引用操作。
+		vertices.push_back({1.0f, 2.0f, 3.0f});
+		vertices.push_back({4.0f, 5.0f, 6.0f});
+
+		for (int i = 0; i < vertices.size(); i++)
+			std::cout << vertices[i] << std::endl;
+		// 类中做了[]的重载，所以我们可以直接使用 [] 操作符来访问vector中的元素，这样代码更简洁和易读。
+
+		vertices.erase(vertices.begin() + 1); // 删除vector中的第二个元素。
+		// erase函数会将后面的元素向前移动来填补被删除元素的位置，这样就避免了内存泄漏的问题，同时也保持了vector的连续性。
+
+		for (Vertex &v : vertices)
+			// vector类实现了对范围for循环的支持
+			// 引用类型只需要传递一个指针而不是复制整个对象，避免不必要的复制操作，提高性能，尤其是当元素较大时。
+			std::cout << v << std::endl;
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -849,6 +886,7 @@ int main()
 	// This::main();
 	// Smart_Pointer::main();
 	// Copying::main();
-	Arrow_Operator::main();
+	// Arrow_Operator::main();
+	vector::main();
 	std::cin.get();
 }
