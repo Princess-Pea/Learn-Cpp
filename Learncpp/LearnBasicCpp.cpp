@@ -832,6 +832,14 @@ namespace vector
 	struct Vertex
 	{
 		float x, y, z;
+
+		Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+
+		Vertex(const Vertex &other) : x(other.x), y(other.y), z(other.z)
+		// 拷贝构造函数，参数是一个const Vertex对象的引用，表示这个函数不会修改传入的Vertex对象，但可以接受const对象和非const对象作为实参。这就是所谓的深拷贝。
+		{
+			std::cout << "Copying Vertex!" << std::endl;
+		}
 	};
 
 	std::ostream &operator<<(std::ostream &stream, const Vertex &v)
@@ -846,8 +854,13 @@ namespace vector
 	void main()
 	{
 		std::vector<Vertex> vertices; // 直接储存Vertex对象比存储指针更高效。它在内存上是连续的，这样可以更好地利用CPU缓存，提高访问速度，并避免了额外的内存分配和指针解引用操作。
+		vertices.reserve(3);		  // 预先分配足够的内存来存储3个Vertex对象，这样可以避免在添加元素时频繁地重新分配内存，提高性能。
 		vertices.push_back({1.0f, 2.0f, 3.0f});
-		vertices.push_back({4.0f, 5.0f, 6.0f});
+		// 等价于 vertices.push_back(Vertex(...))，其实是调用了Vertex类的构造函数来创建一个临时的Vertex对象，并将其传递给push_back函数来添加到vector中，这样我们就可以直接使用花括号来初始化Vertex对象，而不需要显式地调用构造函数。
+		// 实际发生的事情是在main函数的栈帧上创建了一个临时的Vertex对象，调用了Vertex类的构造函数来初始化这个对象，然后将这个对象传递给push_back函数来添加到vector中，最后这个临时对象会被销毁。如果我们要优化性能，可以直接在vector中构造对象，使用emplace_back函数来避免不必要的临时对象创建和复制操作，例如 vertices.emplace_back(1.0f, 2.0f, 3.0f); 这样可以直接在vector中构造一个Vertex对象，避免了临时对象的创建和复制，提高性能。
+		vertices.emplace_back(4.0f, 5.0f, 6.0f);
+		// 这样就只传递了构造函数的参数，而不需要创建一个临时对象来进行复制操作，从而提高性能，尤其是当Vertex对象较大时，因为它避免了不必要的内存分配和数据复制。
+		vertices.emplace_back(7.0f, 8.0f, 9.0f);
 
 		for (int i = 0; i < vertices.size(); i++)
 			std::cout << vertices[i] << std::endl;
@@ -857,9 +870,9 @@ namespace vector
 		// erase函数会将后面的元素向前移动来填补被删除元素的位置，这样就避免了内存泄漏的问题，同时也保持了vector的连续性。
 
 		for (Vertex &v : vertices)
-			// vector类实现了对范围for循环的支持
-			// 引用类型只需要传递一个指针而不是复制整个对象，避免不必要的复制操作，提高性能，尤其是当元素较大时。
 			std::cout << v << std::endl;
+		// vector类实现了对范围for循环的支持
+		// 引用类型只需要传递一个指针而不是复制整个对象，避免不必要的复制操作，提高性能，尤其是当元素较大时。
 	}
 }
 
