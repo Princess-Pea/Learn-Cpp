@@ -876,6 +876,66 @@ namespace vector
 	}
 }
 
+namespace library
+{
+
+}
+
+namespace multiple_return_values
+{
+	struct Sample
+	{
+		int number;
+		std::string name;
+	};
+}
+
+namespace Template
+// 模版允许我们定义一个根据所需用途进行编译的类或函数，或者说让编译器基于我们给定的规则为我们写代码，这样我们就可以编写更通用和可重用的代码，而不需要为每种数据类型编写单独的类或函数，从而提高代码的灵活性和可维护性。
+{
+
+	// void print(int value)
+	// {
+	// 	std::cout << value << std::endl;
+	// }
+	// void print(float value)
+	// {
+	// 	std::cout << value << std::endl;
+	// }
+	// void print(std::string value)
+	// {
+	// 	std::cout << value << std::endl;
+	// }
+	// 上面是函数重载的例子，非常繁琐.
+	// 我们可以使用函数模板来实现同样的功能，而不需要为每种数据类型编写单独的函数，例如：
+	template <typename T>
+	void print(T value)
+	{
+		std::cout << value << std::endl;
+	}
+	// 并不是实际的代码，只有当它被调用时，编译器才会根据传入的参数类型来生成具体的函数代码。
+
+	template <typename T, int N>
+	// 模板参数也可以是一个非类型参数，如一个整数常量。在下面的例子中，T是一个类型模板参数，让Array类可以处理不同类型的数据，而N是一个整数常量模板参数，可以用来定义一个固定大小的数组类，这使得我们可以在编译时指定数组的大小，从而提高代码的灵活性和可重用性。
+	class Array
+	{
+	private:
+		T m_Array[N];
+
+	public:
+		int GetSize() const { return N; }
+	};
+
+	void main()
+	{
+		print(42);			 // 调用函数模板，编译器会根据传入的参数类型自动推断出T的类型，这里T被推断为int。
+		print<float>(3.14f); // 显式指定模板参数类型为float，编译器会生成一个函数来处理float类型的参数。
+
+		Array<float, 5> array; // 创建一个Array类的实例，T被指定为float，N被指定为5，这样我们就创建了一个可以存储5个float类型元素的数组类实例。
+		std::cout << "Array size: " << array.GetSize() << std::endl;
+	}
+}
+
 int main()
 {
 	// pointer::main();
@@ -900,6 +960,7 @@ int main()
 	// Smart_Pointer::main();
 	// Copying::main();
 	// Arrow_Operator::main();
-	vector::main();
+	// vector::main();
+	Template::main();
 	std::cin.get();
 }
